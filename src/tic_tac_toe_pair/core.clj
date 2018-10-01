@@ -1,7 +1,6 @@
 (ns tic-tac-toe-pair.core
+  (:require [tic-tac-toe-pair.game :refer :all])
   (:gen-class))
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
+(defn -main [& args]
+  (play (initialize-game)))

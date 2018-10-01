@@ -8,11 +8,22 @@
   (testing "returns true if board is full")
     (is (= true (is-full? [:x :x :o :o :o :x :x :o :x]))))
 
-(deftest is-available?-test
+(deftest is-move-valid?-test
   (testing "returns false if space on board is taken")
-    (is (= false (is-available? [:x :x nil :o :o nil nil nil nil] 0)))
+    (is (= false
+      (is-move-valid? [:x :x nil :o :o nil nil nil nil] 0)))
   (testing "returns true if space on board is available")
-    (is (= true (is-available? [:x :x nil :o :o nil nil nil nil] 2))))
+    (is (= true
+      (is-move-valid? [:x :x nil :o :o nil nil nil nil] 2)))
+  (testing "returns true if the move value is in the range of the board")
+    (is (= true
+      (is-move-valid? [:x :x nil :o :o nil nil nil nil] 8)))
+  (testing "returns false if the move value is not in the range of the board")
+    (is (= false
+      (is-move-valid? [:x :x nil :o :o nil nil nil nil] 9)))
+  (testing "returns false if the move value is not an integer")
+    (is (= false
+      (is-move-valid? [:x :x nil :o :o nil nil nil nil] "X"))))
 
 (deftest fill-location-test
   (testing "return a board with the provided location filled")
@@ -22,3 +33,4 @@
             is taken")
     (is (= [:x :x nil :o :o nil nil nil nil] 
       (fill-location [:x :x nil :o :o nil nil nil nil] 0 :o))))
+      
