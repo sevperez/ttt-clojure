@@ -66,54 +66,30 @@
     true
     false))
 
+(defn build-congratulations-message [game token]
+  (str "Congratulations! "
+    (keyword-to-token (token game))
+    " won the game!"))
+
 (defn get-game-end-message [game]
   (let [winner (get-winning-token (:board game))]
     (cond 
       (= (:player-1-token game) winner)
-        "Player 1 Wins!"
+        (build-congratulations-message game :player-1-token)
       (= (:player-2-token game) winner)
-        "Player 2 Wins!"
+        (build-congratulations-message game :player-2-token)
       :else
-        "Draw!")))
+        "This game ended in a tie!")))
 
 (defn play [game]
-  (loop [game game]
+  (loop [game     game
+         history  [game]]
     (if (is-game-over? game)
       (do 
-        (print "\u001b[2J")
-        (print "\u001B[0;0f")
-        (println (get-game-end-message game))
-        (draw-board (:board game)))
-      (do
-        (print "\u001b[2J")
-        (print "\u001B[0;0f")
-        (draw-board (:board game))
-        (recur (update-game game (get-move-location)))))))
+        (draw-main game (get-game-end-message game))
+        history)
+      (let [new-game (update-game game (get-move-location game))]
+        (do
+          (draw-main game)
+          (recur new-game (conj history new-game)))))))
 
-; (defn play 
-;   ([game]
-;     (loop [game game]
-;       (if (is-game-over? game)
-;         (get-game-end-message game)
-;         (recur (update-game game (get-move-location))))))
-;   ([game moves]
-;     (loop [game       game
-;            next-move  (first moves)
-;            rest-moves (rest moves)]
-;       (if (is-game-over? game)
-;         (get-game-end-message game)
-;         (recur (update-game game next-move) rest-moves)))))
-
-; function play
-;   (if is-game-over
-;     end-game
-;       (console displays --- game ending message)
-;     play)
-; - play
-;   - loop 
-;   - if over?
-;     - end-game
-;   - else
-;     - play
-;       - ask for move
-;       - make move

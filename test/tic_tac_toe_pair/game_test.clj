@@ -57,26 +57,40 @@
 
 (deftest get-game-end-message-test
   (testing "it returns an appropriate message if player 1 wins")
-    (is (= "Player 1 Wins!"
+    (is (= "Congratulations! X won the game!"
       (get-game-end-message
         {:current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
          :board [:x :o nil :x :o nil :x nil nil]})))
   (testing "it returns an appropriate message if player 2 wins")
-    (is (= "Player 2 Wins!"
+    (is (= "Congratulations! O won the game!"
       (get-game-end-message
         {:current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
          :board [nil :o nil :x :o nil :x :o nil]})))
   (testing "it returns a draw message if there is no winner")
-    (is (= "Draw!"
+    (is (= "This game ended in a tie!"
       (get-game-end-message
         {:current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
          :board [:x :x :o :o :o :x :x :o :x]}))))
 
-
+(deftest play-test
+  (testing "it returns a game history map of length equal to number moves + 1")
+    (with-out-str (is (= 8
+      (count (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game)))))))
+  (testing "it returns a game history map with blank game data at the start")
+    (with-out-str (is (= (initialize-game)
+      (first (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game)))))))
+  (testing "it returns a game history map with the final game data at the end")
+    (with-out-str (is (= [:x :o :x :o :x :o :x nil nil]
+      (:board (last 
+        (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game))))))))
+  (testing "it returns a game history map where the last item is a draw")
+    (with-out-str (is (= [:x :x :o :o :o :x :x :o :x]
+      (:board (last 
+        (with-in-str "1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play (initialize-game)))))))))
 
