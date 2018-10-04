@@ -1,6 +1,7 @@
 (ns tic-tac-toe-pair.console 
   (:require [clojure.string :as s]
-            [tic-tac-toe-pair.board :refer :all])
+            [tic-tac-toe-pair.board :refer :all]
+            [tic-tac-toe-pair.rules :refer :all])
   (:gen-class))
 
 (def board-shape 
@@ -18,65 +19,55 @@
 
 (defn keyword-to-token [keyword] (s/upper-case (name keyword)))
 
-(defn build-square [board square]
+(defn set-square-content [board square]
   (let [token (get board square)]
     (if (nil? token)
       " "
       (keyword-to-token token))))
 
+(defn replace-square-position [board-string board square-pos]
+  (s/replace board-string (str square-pos) (set-square-content board square-pos)))
+
 (defn build-board [board]
-  (loop [square         0
+  (loop [square-pos     0
          filled-board   board-shape]
-    (if (>= square (count board))
+    (if (>= square-pos (count board))
       filled-board
-      (recur
-        (inc square)
-        (s/replace
-          filled-board
-          (str square)
-          (build-square board square))))))
+      (recur (inc square-pos) (replace-square-position filled-board board square-pos)))))
 
 (defn draw-board [board] 
   (println (build-board board)))
 
 (defn clear-terminal []
-  (do 
-    (print "\u001b[2J")
-    (print "\u001B[0;0f")))
+  (do (print "\u001b[2J") (print "\u001B[0;0f")))
 
 (defn draw-header []
   (println "---------------------------\nTic Tac Toe\n---------------------------"))
 
 (defn draw-player-info []
-  (println "Player 1: X     Player 2: O\n"))
+  (println "Player 1 (X)     Player 2 (O)\n"))
 
 (defn draw-footer []
   (println "---------------------------\n"))
 
-(defn draw-main
-  ([game]
-    (do
-      (clear-terminal)
-      (draw-header)
-      (draw-player-info)
-      (draw-board (:board game))
-      (draw-footer)))
-  ([game message]
-    (do
-      (clear-terminal)
-      (draw-header)
-      (draw-player-info)
-      (draw-board (:board game))
-      (println message)
-      (draw-footer))))
+(defn draw-main [game message]
+  (do
+    (clear-terminal)
+    (draw-header)
+    (draw-player-info)
+    (draw-board (:board game))
+    (println message)
+    (draw-footer)))
 
 (defn build-current-player-string [game] 
   (if (= :player-1-token (:current-token game))
     "Player 1's move!"
     "Player 2's move!"))
 
-(defn read-move-input [game] 
-  (let [input (dec (Integer/parseInt (read-line)))]
+(defn get-index-adjusted-input [] (dec (Integer/parseInt (read-line))))
+
+(defn get-player-move [game] 
+  (let [input (get-index-adjusted-input)]
     (if (is-move-valid? (:board game) input) 
       input
       (throw (ex-info "You've entered an invalid move." {})))))
@@ -91,8 +82,7 @@
         (recur (inc index) result)))))
 
 (defn build-choose-move-string [game]
-  (str "Choose a move: ("
-    (s/join ", " (get-available-indices (:board game))) ")"))
+  (str "Choose a move: (" (s/join ", " (get-available-indices (:board game))) ")"))
 
 (defn get-move-location
   ([game]
@@ -102,20 +92,8 @@
       (draw-main game (build-current-player-string game))
       (println message))
     (try 
-      (read-move-input game)
+      (get-player-move game)
       (catch NumberFormatException e 
-        (get-move-location game 
-          (str "Invalid entry. " (build-choose-move-string game))))
+        (get-move-location game (str "Invalid entry. " (build-choose-move-string game))))
       (catch clojure.lang.ExceptionInfo e
-        (get-move-location game
-          (str "Unavailable entry. " (build-choose-move-string game)))))))
-
-
-; defn game msg="choose a move"
-;   try
-;     printline msg
-;     parseint (readline)
-;     if notvalidint
-;       throw custom error
-;   catch
-;     call self (game "error message")
+        (get-move-location game (str "Unavailable entry. " (build-choose-move-string game)))))))

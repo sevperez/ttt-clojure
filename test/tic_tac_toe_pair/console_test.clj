@@ -56,21 +56,21 @@
   (testing "it returns an an integer if input is valid")
     (is (= 5 
       (with-in-str "6" 
-        (read-move-input {:current-token :player-2-token
+        (get-player-move {:current-token :player-2-token
                           :player-1-token :x
                           :player-2-token :o
                           :board [:x nil nil nil nil nil nil nil nil]}))))
   (testing "it throws a NumberFormatException if input is not integer")
     (is (thrown? NumberFormatException 
       (with-in-str "a" 
-        (read-move-input {:current-token :player-2-token
+        (get-player-move {:current-token :player-2-token
                           :player-1-token :x
                           :player-2-token :o
                           :board [:x nil nil nil nil nil nil nil nil]}))))
-  (testing "it throws a custom exception if input is integer but invalid")
+  (testing "it throws a custom exception if input is integer but invalid move")
     (is (thrown? clojure.lang.ExceptionInfo
       (with-in-str "1"
-        (read-move-input {:current-token :player-2-token
+        (get-player-move {:current-token :player-2-token
                           :player-1-token :x
                           :player-2-token :o
                           :board [:x nil nil nil nil nil nil nil nil]})))))

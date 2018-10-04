@@ -2,16 +2,6 @@
   (:require [clojure.test :refer :all]
             [tic-tac-toe-pair.game :refer :all]))
 
-(deftest get-winning-token-test
-  (testing "returns nil if there is no winner")
-    (is (nil? (get-winning-token [nil nil nil :x :o nil nil nil nil])))
-  (testing "returns the winning token if there is a vertical winner")
-    (is (= :x (get-winning-token [:x :o nil :x :o nil :x nil nil])))
-  (testing "returns the winning token if there is a horizontal winner")
-    (is (= :o (get-winning-token [:o :o :o :x :x nil :x nil nil])))
-  (testing "returns the winning token if there is a diagonal winner")
-    (is (= :o (get-winning-token [:o :x :o :x :o nil :x nil :o]))))
-
 (deftest initialize-game-test
   (testing "returns a default game map that has a board")
     (is (= {:current-token :player-1-token
@@ -38,22 +28,6 @@
          :player-2-token :o
          :board [:x :o nil nil :x nil nil  nil nil]}
          4))))
-    
-(deftest is-game-over?-test 
-  (testing "returns false if the game is not over")
-    (is (= false (is-game-over? (initialize-game))))
-  (testing "returns true if the game board is full")
-    (is (= true (is-game-over?
-      {:current-token :player-2-token
-       :player-1-token :x
-       :player-2-token :o
-       :board [:x :x :o :o :o :x :x :o :x]})))
-  (testing "returns true if the game board has a winner")
-    (is (= true (is-game-over?
-      {:current-token :player-2-token
-       :player-1-token :x
-       :player-2-token :o
-       :board [:x :o nil :x :o nil :x nil nil]}))))
 
 (deftest get-game-end-message-test
   (testing "it returns an appropriate message if player 1 wins")
@@ -87,10 +61,8 @@
       (first (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game)))))))
   (testing "it returns a game history map with the final game data at the end")
     (with-out-str (is (= [:x :o :x :o :x :o :x nil nil]
-      (:board (last 
-        (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game))))))))
+      (:board (last (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game))))))))
   (testing "it returns a game history map where the last item is a draw")
     (with-out-str (is (= [:x :x :o :o :o :x :x :o :x]
-      (:board (last 
-        (with-in-str "1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play (initialize-game)))))))))
+      (:board (last (with-in-str "1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play (initialize-game)))))))))
 
