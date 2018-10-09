@@ -1,8 +1,6 @@
 (ns tic-tac-toe-pair.console 
   (:require [clojure.string :as s]
-            [tic-tac-toe-pair.board :refer :all]
-            [tic-tac-toe-pair.rules :refer :all])
-  (:gen-class))
+            [tic-tac-toe-pair.rules :refer [is-move-valid?]]))
 
 (def board-shape 
   (str "          |     |     \n"
@@ -19,16 +17,16 @@
 
 (defn keyword-to-token [keyword] (s/upper-case (name keyword)))
 
-(defn set-square-content [board square]
+(defn- set-square-content [board square]
   (let [token (get board square)]
     (if (nil? token)
       " "
       (keyword-to-token token))))
 
-(defn replace-square-position [board-string board square-pos]
+(defn- replace-square-position [board-string board square-pos]
   (s/replace board-string (str square-pos) (set-square-content board square-pos)))
 
-(defn build-board [board]
+(defn- build-board [board]
   (loop [square-pos     0
          filled-board   board-shape]
     (if (>= square-pos (count board))
@@ -38,23 +36,26 @@
 (defn draw-board [board] 
   (println (build-board board)))
 
-(defn clear-terminal []
+(defn- clear-terminal []
   (do (print "\u001b[2J") (print "\u001B[0;0f")))
 
-(defn draw-header []
+(defn- draw-header []
   (println "---------------------------\nTic Tac Toe\n---------------------------"))
 
-(defn draw-player-info []
-  (println "Player 1 (X)     Player 2 (O)\n"))
+(defn draw-player-info [player-1-token player-2-token]
+  (println (str
+    "Player 1 (" (keyword-to-token player-1-token) ")"
+    "     "
+    "Player 2 (" (keyword-to-token player-2-token) ")")))
 
-(defn draw-footer []
+(defn- draw-footer []
   (println "---------------------------\n"))
 
 (defn draw-main [game message]
   (do
     (clear-terminal)
     (draw-header)
-    (draw-player-info)
+    (draw-player-info (:player-1-token game) (:player-2-token game))
     (draw-board (:board game))
     (println message)
     (draw-footer)))
@@ -64,7 +65,7 @@
     "Player 1's move!"
     "Player 2's move!"))
 
-(defn get-index-adjusted-input [] (dec (Integer/parseInt (read-line))))
+(defn- get-index-adjusted-input [] (dec (Integer/parseInt (read-line))))
 
 (defn get-player-move [game] 
   (let [input (get-index-adjusted-input)]
@@ -72,7 +73,7 @@
       input
       (throw (ex-info "You've entered an invalid move." {})))))
 
-(defn get-available-indices [board]
+(defn- get-available-indices [board]
   (loop [index  0
          result []]
     (if (>= index (count board))
@@ -97,3 +98,6 @@
         (get-move-location game (str "Invalid entry. " (build-choose-move-string game))))
       (catch clojure.lang.ExceptionInfo e
         (get-move-location game (str "Unavailable entry. " (build-choose-move-string game)))))))
+
+(defn build-congratulations-message [token]
+  (str "Congratulations! " (keyword-to-token token) " won the game!"))

@@ -1,7 +1,7 @@
 (ns tic-tac-toe-pair.rules-test
   (:require [clojure.test :refer :all]
             [tic-tac-toe-pair.rules :refer :all]
-            [tic-tac-toe-pair.game :refer :all]))
+            [tic-tac-toe-pair.game :refer [initialize-game]]))
 
 (deftest is-move-valid?-test
   (testing "returns false if space on board is taken")

@@ -35,7 +35,7 @@
         (draw-board [nil :x nil :x nil nil nil :o nil])))))
 
 (deftest get-move-location-test
-  (testing "it returns an integer value one less than valid input")
+  (testing "it returns an integer that is adjusted to match the zero-indexed board")
     (with-out-str (is 
       (= 4 (with-in-str "5"
         (get-move-location
@@ -75,6 +75,11 @@
                           :player-2-token :o
                           :board [:x nil nil nil nil nil nil nil nil]})))))
 
+(deftest draw-player-info-test 
+  (testing "it returns a string with the player names and tokens")
+    (is (= "Player 1 (X)     Player 2 (O)\n" 
+      (with-out-str (draw-player-info :x :o)))))
+
 (deftest build-current-player-string-test
   (testing "it returns a string with the current player's name and token")
     (is (= "Player 1's move!"
@@ -105,3 +110,11 @@
          :player-1-token :x
          :player-2-token :o
          :board [:x :o nil :x :x nil :o nil nil]}))))
+
+(deftest build-congratulations-message-test 
+  (testing "it returns a string to congratulate the player with the :x token")
+    (is (= "Congratulations! X won the game!"
+      (build-congratulations-message :x)))
+  (testing "it returns a string to congratulate the player with the :o token")
+    (is (= "Congratulations! O won the game!"
+      (build-congratulations-message :o))))

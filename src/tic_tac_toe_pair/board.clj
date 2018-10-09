@@ -1,5 +1,4 @@
-(ns tic-tac-toe-pair.board 
-  (:gen-class))
+(ns tic-tac-toe-pair.board)
 
 (defn is-full? [board]
   (not (some nil? board)))
