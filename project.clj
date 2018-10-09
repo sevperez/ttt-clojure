@@ -6,4 +6,6 @@
   :dependencies [[org.clojure/clojure "1.8.0"]]
   :main ^:skip-aot tic-tac-toe-pair.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles { :uberjar {:aot :all}
+              :dev {:plugins [[venantius/ultra "0.5.2"] [com.jakemccrary/lein-test-refresh "0.23.0"]]}
+  })
