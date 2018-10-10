@@ -51,6 +51,14 @@
 (defn- draw-footer []
   (println "---------------------------\n"))
 
+(defn draw-intro [game]
+  (do 
+    (clear-terminal)
+    (draw-header)
+    (println "\n")
+    (draw-board (:board game))
+    (draw-footer)))
+
 (defn draw-main [game message]
   (do
     (clear-terminal)
@@ -101,3 +109,36 @@
 
 (defn build-congratulations-message [token]
   (str "Congratulations! " (keyword-to-token token) " won the game!"))
+
+(defn prompt-for-player-mark [] 
+    (str "Choose your mark on the board: (X or O)"))
+
+(defn- is-mark-input-valid? [input] 
+  (cond
+    (= "X" input) true
+    (= "x" input) true
+    (= "O" input) true
+    (= "o" input) true
+    :else false))
+
+(defn- mark-input-to-keyword [input]
+  (cond
+    (or (= "X" input) (= "x" input)) :x
+    (or (= "O" input) (= "o" input)) :o))
+
+(defn read-player-mark-input [] 
+  (let [input (read-line)]
+    (if (is-mark-input-valid? input)
+      (mark-input-to-keyword input)
+      (throw (ex-info "You've entered an invalid mark." {})))))
+
+(defn get-player-mark 
+  ([game] (get-player-mark game (str "")))
+  ([game message] 
+   (do
+     (draw-intro game)
+     (println (str message (prompt-for-player-mark)))
+     (try 
+       (read-player-mark-input)
+       (catch clojure.lang.ExceptionInfo e
+         (get-player-mark game (str "Invalid mark. ")))))))
