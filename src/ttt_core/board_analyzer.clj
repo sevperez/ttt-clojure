@@ -39,3 +39,5 @@
 (defn empty-locations [board]
   (vec (filter (fn [location] (is-location-available? board location))
     (range (count board)))))
+
+(defn calculate-board-size [board] (int (Math/sqrt (count board))))

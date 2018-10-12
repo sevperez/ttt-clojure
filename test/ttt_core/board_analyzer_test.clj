@@ -23,3 +23,14 @@
   (testing "it returns a vector of empty locations on the board")
     (is (= [2 5 6 7 8]
       (empty-locations [:x :x nil :o :o nil nil nil nil]))))
+
+(deftest calculate-board-size-test
+  (testing "it returns the board size of a 3x3 board"
+    (is (= 3 (calculate-board-size [nil nil nil nil nil nil nil nil nil]))))
+  (testing "it returns the board size of a 4x4 board"
+    (is (= 4 (calculate-board-size [nil nil nil nil nil nil nil nil
+                                    nil nil nil nil nil nil nil nil]))))
+  (testing "it returns the board size of a 5x5 board"
+    (is (= 5 (calculate-board-size [nil nil nil nil nil nil nil nil nil nil
+                                    nil nil nil nil nil nil nil nil nil nil
+                                    nil nil nil nil nil])))))

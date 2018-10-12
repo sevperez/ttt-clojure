@@ -42,14 +42,6 @@
 (defn- draw-header []
   (println "---------------------------\nTic Tac Toe\n---------------------------"))
 
-; (defn draw-player-info [game]
-;   (let [player-1-name (if (= :human-vs-human (:game-mode game)) "Player 1" "Player")
-;         player-2-name (if (= :human-vs-human (:game-mode game)) "Player 2" "Computer")]
-;     (println (str
-;     player-1-name " (" (keyword-to-token (:player-1-token game)) ")"
-;     "     "
-;     player-2-name " (" (keyword-to-token (:player-2-token game)) ")\n"))))
-
 (defn draw-player-info [game]
   (let [mode    (:game-mode game)
         token-1 (keyword-to-token (:player-1-token game))
