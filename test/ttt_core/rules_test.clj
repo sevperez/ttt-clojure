@@ -1,7 +1,7 @@
-(ns tic-tac-toe-pair.rules-test
+(ns ttt-core.rules-test
   (:require [clojure.test :refer :all]
-            [tic-tac-toe-pair.rules :refer :all]
-            [tic-tac-toe-pair.game :refer [initialize-game]]))
+            [ttt-core.rules :refer :all]
+            [ttt-core.game :refer [initialize-game]]))
 
 (deftest is-move-valid?-test
   (testing "returns false if space on board is taken")
@@ -35,13 +35,15 @@
     (is (= false (is-game-over? (initialize-game))))
   (testing "returns true if the game board is full")
     (is (= true (is-game-over?
-      {:current-token :player-2-token
+      {:game-mode :human-vs-human
+       :current-token :player-2-token
        :player-1-token :x
        :player-2-token :o
        :board [:x :x :o :o :o :x :x :o :x]})))
   (testing "returns true if the game board has a winner")
     (is (= true (is-game-over?
-      {:current-token :player-2-token
+      {:game-mode :human-vs-human
+       :current-token :player-2-token
        :player-1-token :x
        :player-2-token :o
        :board [:x :o nil :x :o nil :x nil nil]}))))

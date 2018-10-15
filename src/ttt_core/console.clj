@@ -1,6 +1,6 @@
-(ns tic-tac-toe-pair.console 
+(ns ttt-core.console 
   (:require [clojure.string :as s]
-            [tic-tac-toe-pair.rules :refer [is-move-valid?]]))
+            [ttt-core.rules :refer [is-move-valid?]]))
 
 (def board-shape 
   (str "          |     |     \n"
@@ -42,11 +42,16 @@
 (defn- draw-header []
   (println "---------------------------\nTic Tac Toe\n---------------------------"))
 
-(defn draw-player-info [player-1-token player-2-token]
-  (println (str
-    "Player 1 (" (keyword-to-token player-1-token) ")"
-    "     "
-    "Player 2 (" (keyword-to-token player-2-token) ")")))
+(defn draw-player-info [game]
+  (let [mode    (:game-mode game)
+        token-1 (keyword-to-token (:player-1-token game))
+        token-2 (keyword-to-token (:player-2-token game))]
+    (cond
+      (= :human-vs-human mode)
+        (println (str "Player 1 (" token-1 ")     Player 2 (" token-2 ")\n"))
+      (= :human-vs-computer mode)
+        (println (str "Player (" token-1 ")     Computer (" token-2 ")\n"))
+      :else (println "******* (X)     ******* (O)\n"))))
 
 (defn- draw-footer []
   (println "---------------------------\n"))
@@ -55,19 +60,45 @@
   (do
     (clear-terminal)
     (draw-header)
-    (draw-player-info (:player-1-token game) (:player-2-token game))
+    (draw-player-info game)
     (draw-board (:board game))
     (println message)
     (draw-footer)))
 
-(defn build-current-player-string [game] 
-  (if (= :player-1-token (:current-token game))
-    "Player 1's move!"
-    "Player 2's move!"))
+(defn build-choose-game-mode-string 
+  ([] (build-choose-game-mode-string ""))
+  ([message]
+    (str message "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer")))
+
+(defn request-game-mode
+  ([game] (request-game-mode game ""))
+  ([game message]
+    (let [modes {:1 :human-vs-human :2 :human-vs-computer}]
+      (do
+        (draw-main game "--- Game Mode Selection ---")
+        (println (build-choose-game-mode-string message))
+        (get modes (keyword (read-line)))))))
+
+(defn get-game-mode-selection [game] 
+  (loop [selection (request-game-mode game)]
+    (if (not (nil? selection))
+      selection
+      (recur (request-game-mode game "Invalid selection. ")))))
+
+(defn handle-game-mode-selection [game]
+  (assoc game :game-mode (get-game-mode-selection game)))
+
+(defn current-player-name [current-player-token game-mode]
+  (if (= game-mode :human-vs-human)
+    (if (= current-player-token :player-1-token) "Player 1" "Player 2")
+    (if (= current-player-token :player-1-token) "Player" "Computer")))
+
+(defn build-current-player-string [name]
+  (str name "'s move!"))
 
 (defn- get-index-adjusted-input [] (dec (Integer/parseInt (read-line))))
 
-(defn get-player-move [game] 
+(defn get-player-move-selection [game] 
   (let [input (get-index-adjusted-input)]
     (if (is-move-valid? (:board game) input) 
       input
@@ -85,19 +116,21 @@
 (defn build-choose-move-string [game]
   (str "Choose a move: (" (s/join ", " (get-available-indices (:board game))) ")"))
 
-(defn get-move-location
+(defn handle-player-move-selection
   ([game]
-    (get-move-location game (build-choose-move-string game)))
+    (handle-player-move-selection game (build-choose-move-string game)))
   ([game message]
     (do
-      (draw-main game (build-current-player-string game))
+      (draw-main game
+        (build-current-player-string
+          (current-player-name (:current-token game) (:game-mode game))))
       (println message))
     (try 
-      (get-player-move game)
+      (get-player-move-selection game)
       (catch NumberFormatException e 
-        (get-move-location game (str "Invalid entry. " (build-choose-move-string game))))
+        (handle-player-move-selection game (str "Invalid entry. " (build-choose-move-string game))))
       (catch clojure.lang.ExceptionInfo e
-        (get-move-location game (str "Unavailable entry. " (build-choose-move-string game)))))))
+        (handle-player-move-selection game (str "Unavailable entry. " (build-choose-move-string game)))))))
 
 (defn build-congratulations-message [token]
   (str "Congratulations! " (keyword-to-token token) " won the game!"))

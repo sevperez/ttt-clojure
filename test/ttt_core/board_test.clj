@@ -1,6 +1,6 @@
-(ns tic-tac-toe-pair.board-test
+(ns ttt-core.board-test
   (:require [clojure.test :refer :all]
-            [tic-tac-toe-pair.board :refer :all]))
+            [ttt-core.board :refer :all]))
 
 (deftest is-full?-test
   (testing "returns false if board is not full")

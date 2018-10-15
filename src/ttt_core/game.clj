@@ -1,11 +1,15 @@
-(ns tic-tac-toe-pair.game
-  (:require [tic-tac-toe-pair.rules :refer [get-winning-token is-game-over? is-move-valid?]]
-            [tic-tac-toe-pair.board :refer [fill-location]]
-            [tic-tac-toe-pair.console :refer
-              [draw-main get-move-location keyword-to-token build-congratulations-message]]))
+(ns ttt-core.game
+  (:require [ttt-core.rules :refer [get-winning-token is-game-over? is-move-valid?]]
+            [ttt-core.board :refer [fill-location]]
+            [ttt-core.board-analyzer :refer [empty-locations]]
+            [ttt-core.console :refer
+              [draw-main handle-player-move-selection keyword-to-token
+               build-congratulations-message handle-game-mode-selection]]
+            [artificial-intelligence.random :refer [select-move] :as ai]))
 
 (defn initialize-game [] 
-  {:current-token :player-1-token
+  {:game-mode nil
+   :current-token :player-1-token
    :player-1-token :x
    :player-2-token :o
    :board [nil nil nil nil nil nil nil  nil nil]})
@@ -35,12 +39,22 @@
       (build-congratulations-message winner)
       "This game ended in a tie!")))
 
-(defn play [game]
-  (loop [game     game
+(defn- ai-move [game]
+  (ai/select-move (empty-locations (:board game))))
+
+(defn get-next-move [game]
+  (let [mode          (:game-mode game)
+        current-token (:current-token game)]
+    (if (or (= :player-1-token current-token) (= :human-vs-human (:game-mode game)))
+      (handle-player-move-selection game)
+      (ai-move game))))
+
+(defn play []
+  (loop [game     (handle-game-mode-selection (initialize-game))
          history  [game]]
     (if (is-game-over? game)
       (do 
         (draw-main game (get-game-end-message game))
         history)
-      (let [new-game (update-game game (get-move-location game))]
+      (let [new-game (update-game game (get-next-move game))]
         (recur new-game (conj history new-game))))))

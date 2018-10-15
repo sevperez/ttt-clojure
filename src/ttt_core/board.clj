@@ -1,4 +1,4 @@
-(ns tic-tac-toe-pair.board)
+(ns ttt-core.board)
 
 (defn is-full? [board]
   (not (some nil? board)))
