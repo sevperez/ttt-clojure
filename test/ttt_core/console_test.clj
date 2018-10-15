@@ -173,37 +173,18 @@
          :player-2-token :o
          :board [:x :o nil :x :o nil :x nil nil]})))))
 
+(deftest current-player-name-test
+  (testing "it returns the correct current player name in a human-vs-human game")
+    (is (= "Player 1" (current-player-name :player-1-token :human-vs-human)))
+    (is (= "Player 2" (current-player-name :player-2-token :human-vs-human)))
+  (testing "it returns the correct current player name in a human-vs-computer game")
+    (is (= "Player" (current-player-name :player-1-token :human-vs-computer)))
+    (is (= "Computer" (current-player-name :player-2-token :human-vs-computer))))
+
 (deftest build-current-player-string-test
   (testing "it returns a string with the current player info in human-vs-human")
-    (is (= "Player 1's move!"
-      (build-current-player-string
-        {:game-mode :human-vs-human
-         :current-token :player-1-token
-         :player-1-token :x
-         :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]})))
-    (is (= "Player 2's move!"
-      (build-current-player-string
-        {:game-mode :human-vs-human
-         :current-token :player-2-token
-         :player-1-token :x
-         :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]})))
-  (testing "it returns a string with the current player info in human-vs-computer")
-    (is (= "Player's move!"
-      (build-current-player-string
-        {:game-mode :human-vs-computer
-         :current-token :player-1-token
-         :player-1-token :x
-         :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]})))
-    (is (= "Computer's move!"
-      (build-current-player-string
-        {:game-mode :human-vs-computer
-         :current-token :player-2-token
-         :player-1-token :x
-         :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]}))))
+    (is (= "Player 1's move!" (build-current-player-string "Player 1")))
+    (is (= "Player 2's move!" (build-current-player-string "Player 2"))))
 
 (deftest build-choose-move-string-test
   (testing "it returns a string listing all 9 spaces available on empty board")

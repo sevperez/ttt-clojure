@@ -88,13 +88,13 @@
 (defn handle-game-mode-selection [game]
   (assoc game :game-mode (get-game-mode-selection game)))
 
-(defn build-current-player-string [game]
-  (let [mode          (:game-mode game)
-        player-1-name (if (= :human-vs-human mode) "Player 1" "Player")
-        player-2-name (if (= :human-vs-human mode) "Player 2" "Computer")]
-    (if (= :player-1-token (:current-token game))
-      (str player-1-name "'s move!")
-      (str player-2-name "'s move!"))))
+(defn current-player-name [current-player-token game-mode]
+  (if (= game-mode :human-vs-human)
+    (if (= current-player-token :player-1-token) "Player 1" "Player 2")
+    (if (= current-player-token :player-1-token) "Player" "Computer")))
+
+(defn build-current-player-string [name]
+  (str name "'s move!"))
 
 (defn- get-index-adjusted-input [] (dec (Integer/parseInt (read-line))))
 
@@ -121,7 +121,9 @@
     (handle-player-move-selection game (build-choose-move-string game)))
   ([game message]
     (do
-      (draw-main game (build-current-player-string game))
+      (draw-main game
+        (build-current-player-string
+          (current-player-name (:current-token game) (:game-mode game))))
       (println message))
     (try 
       (get-player-move-selection game)
