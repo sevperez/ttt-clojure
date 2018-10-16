@@ -1,6 +1,6 @@
 (ns ttt-core.board-evaluator
   (:require [ttt-core.board-analyzer :refer
-              [winning-lines calculate-board-size possible-board-states]]
+              [winning-lines calculate-board-size possible-board-states empty-locations]]
             [ttt-core.rules :refer [is-game-over? get-winning-token]]))
 
 (defn terminal-score [board test-token other-token min max]
@@ -45,4 +45,5 @@
   {:terminal-score  terminal-score
    :heuristic-score heuristic-score
    :is-leaf?  is-game-over?
-   :possible-board-states possible-board-states})
+   :possible-board-states possible-board-states
+   :empty-locations empty-locations})

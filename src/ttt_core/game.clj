@@ -2,10 +2,12 @@
   (:require [ttt-core.rules :refer [get-winning-token is-game-over? is-move-valid?]]
             [ttt-core.board :refer [fill-location]]
             [ttt-core.board-analyzer :refer [empty-locations]]
+            [ttt-core.board-evaluator :refer [eval-functions]]
             [ttt-core.console :refer
               [draw-main handle-player-move-selection keyword-to-token
                build-congratulations-message handle-game-mode-selection]]
-            [artificial-intelligence.random :refer [select-move] :as ai]))
+            [artificial-intelligence.ai :refer [choose-move] :as ai]
+            [artificial-intelligence.minimax :refer [minimax] :as mm]))
 
 (defn initialize-game [] 
   {:game-mode nil
@@ -40,7 +42,7 @@
       "This game ended in a tie!")))
 
 (defn- ai-move [game]
-  (ai/select-move (empty-locations (:board game))))
+  (ai/choose-move eval-functions mm/minimax game :player-2-token))
 
 (defn get-next-move [game]
   (let [mode          (:game-mode game)
