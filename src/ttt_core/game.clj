@@ -52,7 +52,7 @@
 (defn play []
   (loop [game     (handle-game-mode-selection (initialize-game))
          history  [game]]
-    (if (is-game-over? game)
+    (if (is-game-over? (:board game))
       (do 
         (draw-main game (get-game-end-message game))
         history)

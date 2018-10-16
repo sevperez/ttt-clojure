@@ -1,5 +1,7 @@
 (ns ttt-core.board)
 
+(def default-board-size 3)
+
 (defn is-full? [board]
   (not (some nil? board)))
 

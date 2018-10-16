@@ -1,11 +1,10 @@
 (ns ttt-core.rules
-  (:require [ttt-core.board :refer [is-full? is-location-available? is-location-valid?]]
+  (:require [ttt-core.board :refer
+              [is-full? is-location-available? is-location-valid? default-board-size]]
             [ttt-core.board-analyzer :refer [winning-lines]]))
 
 (defn is-move-valid? [board location]
   (and (is-location-valid? board location) (is-location-available? board location)))
-
-(def default-board-size 3)
 
 (defn- same-tokens? [line]
   (every? (fn [token] (= token (first line))) line))
@@ -29,7 +28,7 @@
 
 (defn- is-game-won? [board] (not= nil (get-winning-token board)))
 
-(defn is-game-over? [game]
-  (if (or (is-full? (:board game)) (is-game-won? (:board game)))
+(defn is-game-over? [board]
+  (if (or (is-full? board) (is-game-won? board))
     true
     false))

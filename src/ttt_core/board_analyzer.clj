@@ -1,5 +1,5 @@
 (ns ttt-core.board-analyzer
-  (:require [ttt-core.board :refer [is-location-available?]]))
+  (:require [ttt-core.board :refer [is-location-available?, default-board-size]]))
 
 (defn- square-position [first second size] (+ first (* second size)))
 
@@ -31,13 +31,22 @@
 
 (defn- right-diagonal-line [size] (diagonal-line size false))
 
-(defn winning-lines [size]
-  (vec (map (fn [line] (vec line))
-    (reduce (fn [lines func] (concat lines (func size))) []
-      [horizontal-lines vertical-lines left-diagonal-line right-diagonal-line]))))
+(defn winning-lines
+  ([]
+    (winning-lines default-board-size))
+  ([size]
+    (vec (map (fn [line] (vec line))
+      (reduce (fn [lines func] (concat lines (func size))) []
+        [horizontal-lines vertical-lines left-diagonal-line right-diagonal-line])))))
 
 (defn empty-locations [board]
   (vec (filter (fn [location] (is-location-available? board location))
     (range (count board)))))
 
 (defn calculate-board-size [board] (int (Math/sqrt (count board))))
+
+(defn possible-board-states [board next-token]
+  (vec (reduce 
+    (fn [possible-boards idx]
+      (conj possible-boards (assoc board idx next-token)))
+    [] (empty-locations board))))
