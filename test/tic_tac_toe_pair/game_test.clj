@@ -55,14 +55,39 @@
 (deftest play-test
   (testing "it returns a game history map of length equal to number moves + 1")
     (with-out-str (is (= 8
-      (count (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game)))))))
+      (count (with-in-str "X\n1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game)))))))
   (testing "it returns a game history map with blank game data at the start")
     (with-out-str (is (= (initialize-game)
-      (first (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game)))))))
+      (first (with-in-str "X\n1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game)))))))
   (testing "it returns a game history map with the final game data at the end")
     (with-out-str (is (= [:x :o :x :o :x :o :x nil nil]
-      (:board (last (with-in-str "1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game))))))))
+      (:board (last (with-in-str "X\n1\n2\n3\n4\n5\n6\n7\n" (play (initialize-game))))))))
   (testing "it returns a game history map where the last item is a draw")
     (with-out-str (is (= [:x :x :o :o :o :x :x :o :x]
-      (:board (last (with-in-str "1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play (initialize-game)))))))))
+      (:board (last (with-in-str "X\n1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play (initialize-game)))))))))
 
+(deftest set-player-tokens-test 
+  (testing "it sets the game :player-1-token to :x if given :x")
+    (is (= :x 
+      (:player-1-token (set-player-tokens :x {:current-token :player-2-token
+                                              :player-1-token :x
+                                              :player-2-token :o
+                                              :board [nil nil nil nil nil nil nil nil nil]}))))
+  (testing "it sets the game :player-2-token to :o if given :x")
+    (is (= :o 
+      (:player-2-token (set-player-tokens :x {:current-token :player-2-token
+                                              :player-1-token :x
+                                              :player-2-token :o
+                                              :board [nil nil nil nil nil nil nil nil nil]}))))
+  (testing "it sets the game :player-1-token to :o if given :o")
+    (is (= :o 
+      (:player-1-token (set-player-tokens :o {:current-token :player-2-token
+                                              :player-1-token :x
+                                              :player-2-token :o
+                                              :board [nil nil nil nil nil nil nil nil nil]}))))
+  (testing "it sets the game :player-2-token to :x if given :o")
+      (is (= :x 
+        (:player-2-token (set-player-tokens :o {:current-token :player-2-token
+                                                :player-1-token :x
+                                                :player-2-token :o
+                                                :board [nil nil nil nil nil nil nil nil nil]})))))

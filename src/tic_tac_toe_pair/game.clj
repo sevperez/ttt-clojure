@@ -2,7 +2,7 @@
   (:require [tic-tac-toe-pair.rules :refer [get-winning-token is-game-over? is-move-valid?]]
             [tic-tac-toe-pair.board :refer [fill-location]]
             [tic-tac-toe-pair.console :refer
-              [draw-main get-move-location keyword-to-token build-congratulations-message]]))
+              [draw-intro draw-main get-move-location get-player-mark keyword-to-token build-congratulations-message]]))
 
 (defn initialize-game [] 
   {:current-token :player-1-token
@@ -35,12 +35,17 @@
       (build-congratulations-message winner)
       "This game ended in a tie!")))
 
-(defn play [game]
-  (loop [game     game
-         history  [game]]
+(defn set-player-tokens [player-1-token game]
+  (assoc game 
+    :player-1-token player-1-token
+    :player-2-token (if (= :x player-1-token) :o :x)))
+  
+(defn play
+  ([game] (loop [history  [(set-player-tokens (get-player-mark game) game)]]
+  (let [game (last history)]
     (if (is-game-over? game)
       (do 
         (draw-main game (get-game-end-message game))
         history)
-      (let [new-game (update-game game (get-move-location game))]
-        (recur new-game (conj history new-game))))))
+        (let [new-game (update-game game (get-move-location game))]
+          (recur (conj history new-game))))))))

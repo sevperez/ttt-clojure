@@ -118,3 +118,44 @@
   (testing "it returns a string to congratulate the player with the :o token")
     (is (= "Congratulations! O won the game!"
       (build-congratulations-message :o))))
+ 
+(deftest read-player-mark-input-test
+  (testing "it returns :x if player enters X")
+    (is (= :x 
+      (with-in-str "X" 
+        (read-player-mark-input))))
+  (testing "it returns :x if player enters X")
+    (is (= :x 
+      (with-in-str "x" 
+          (read-player-mark-input))))
+    (testing "it returns :o if player enters O")
+    (is (= :o 
+      (with-in-str "O" 
+        (read-player-mark-input))))
+    (testing "it throws a custom exception if input is not a case insensitive X or O")
+    (is (thrown? clojure.lang.ExceptionInfo
+      (with-in-str "1"
+        (read-player-mark-input)))))
+
+(deftest prompt-for-player-mark-test 
+  (testing "it returns a default string asking the player to choose the mark they want to use")
+  (is (= "Choose your mark on the board: (X or O)" 
+    (prompt-for-player-mark))))
+
+(deftest get-player-mark-test 
+  (testing "it returns :x if the player enters x")
+  (with-out-str (is (= :x 
+    (with-in-str "x" 
+      (get-player-mark 
+        {:current-token :player-2-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [nil nil nil nil nil nil nil nil nil]})))))
+  (testing "it keeps asking the player for a mark if the player enters an invalid mark")
+  (with-out-str (is (= :x 
+    (with-in-str "1\nX" 
+      (get-player-mark 
+        {:current-token :player-2-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [nil nil nil nil nil nil nil nil nil]}))))))
