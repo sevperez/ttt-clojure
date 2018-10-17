@@ -32,16 +32,8 @@
     
 (deftest is-game-over?-test 
   (testing "returns false if the game is not over")
-    (is (= false (is-game-over? (initialize-game))))
+    (is (= false (is-game-over? [nil nil nil nil nil nil nil nil nil])))
   (testing "returns true if the game board is full")
-    (is (= true (is-game-over?
-      {:current-token :player-2-token
-       :player-1-token :x
-       :player-2-token :o
-       :board [:x :x :o :o :o :x :x :o :x]})))
+    (is (= true (is-game-over? [:x :x :o :o :o :x :x :o :x])))
   (testing "returns true if the game board has a winner")
-    (is (= true (is-game-over?
-      {:current-token :player-2-token
-       :player-1-token :x
-       :player-2-token :o
-       :board [:x :o nil :x :o nil :x nil nil]}))))
+    (is (= true (is-game-over? [:x :o nil :x :o nil :x nil nil]))))

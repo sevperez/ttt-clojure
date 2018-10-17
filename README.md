@@ -16,4 +16,4 @@ A functional programming style implementation of Impossible TTT on the command l
 
 #### Testing
 
-* For unit tests, change directories into the `test` directory and run the `lein test` command.
+* For unit tests run the `lein test-refresh` command.

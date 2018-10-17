@@ -1,14 +1,24 @@
 (ns tic-tac-toe-pair.game
   (:require [tic-tac-toe-pair.rules :refer [get-winning-token is-game-over? is-move-valid?]]
+            [tic-tac-toe-pair.computer-player :refer [get-ai-move]]
             [tic-tac-toe-pair.board :refer [fill-location]]
             [tic-tac-toe-pair.console :refer
               [draw-intro draw-main get-move-location get-player-mark keyword-to-token build-congratulations-message]]))
 
-(defn initialize-game [] 
+(def default-game 
   {:current-token :player-1-token
-   :player-1-token :x
-   :player-2-token :o
+   :player-1-token nil
+   :player-2-token nil
    :board [nil nil nil nil nil nil nil  nil nil]})
+
+(defn set-player-tokens [player-1-token game]
+  (assoc game 
+    :player-1-token player-1-token
+    :player-2-token (if (= :x player-1-token) :o :x)))
+
+(defn initialize-game [game]
+  (let [player-mark (get-player-mark game)] 
+    (set-player-tokens player-mark game)))
 
 (defn- update-current-player [game]
   (assoc game :current-token
@@ -35,17 +45,18 @@
       (build-congratulations-message winner)
       "This game ended in a tie!")))
 
-(defn set-player-tokens [player-1-token game]
-  (assoc game 
-    :player-1-token player-1-token
-    :player-2-token (if (= :x player-1-token) :o :x)))
-  
-(defn play
-  ([game] (loop [history  [(set-player-tokens (get-player-mark game) game)]]
-  (let [game (last history)]
-    (if (is-game-over? game)
-      (do 
-        (draw-main game (get-game-end-message game))
-        history)
-        (let [new-game (update-game game (get-move-location game))]
-          (recur (conj history new-game))))))))
+(defmulti get-move :current-token)
+(defmethod get-move :player-1-token [game]
+  (get-move-location game))
+(defmethod get-move :player-2-token [game]
+  (get-ai-move game))
+
+(defn play [game] 
+  (loop [history  [game]]
+    (let [game (last history)]
+      (if (is-game-over? (:board game))
+        (do 
+          (draw-main game (get-game-end-message game))
+          history)
+        (let [new-game (update-game game (get-move game))]
+         (recur (conj history new-game)))))))
