@@ -13,5 +13,5 @@
         valid-locations (vec (range board-size))]
     (contains? valid-locations location)))
 
-(defn fill-location [board location token]
+(defn fill-location [board token location]
   (assoc board location token))

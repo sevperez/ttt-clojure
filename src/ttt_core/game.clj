@@ -7,7 +7,7 @@
               [draw-main handle-player-move-selection keyword-to-token
                build-congratulations-message handle-game-mode-selection]]
             [artificial-intelligence.ai :refer [choose-move] :as ai]
-            [artificial-intelligence.minimax :refer [minimax] :as mm]))
+            [artificial-intelligence.minimax :refer [minimax-memo] :as mm]))
 
 (defn initialize-game [] 
   {:game-mode nil
@@ -18,14 +18,12 @@
 
 (defn- update-current-player [game]
   (assoc game :current-token
-    (if (= (:current-token game) :player-1-token)
-      :player-2-token
-      :player-1-token)))
+    (if (= (:current-token game) :player-1-token) :player-2-token :player-1-token)))
 
 (defn- get-current-token [game] ((:current-token game) game))
 
 (defn- update-board [game location]
-  (assoc game :board (fill-location (:board game) location (get-current-token game))))
+  (assoc game :board (fill-location (:board game) (get-current-token game) location)))
 
 (defn- update-board-and-player [game location]
   ((comp update-current-player update-board) game location))
@@ -42,7 +40,7 @@
       "This game ended in a tie!")))
 
 (defn- ai-move [game]
-  (ai/choose-move eval-functions mm/minimax game :player-2-token))
+  (ai/choose-move eval-functions mm/minimax-memo game :player-2-token))
 
 (defn get-next-move [game]
   (let [mode          (:game-mode game)

@@ -41,9 +41,7 @@
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
-         :board [:x :x nil 
-                 :o :o nil 
-                 :o :x :o]}
+         :board [:x :x nil :o :o nil :o :x :o]}
         :player-2-token)))
   (testing "it returns index of a blocking move if loss imminent")
     (is (= 8
@@ -52,9 +50,7 @@
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
-         :board [nil nil :o 
-                 nil :x :o 
-                 :x nil nil]}
+         :board [nil nil :o nil :x :o :x nil nil]}
         :player-2-token)))
   (testing "it preferentially returns a winning move over a blocking move")
     (is (= 2
@@ -63,7 +59,5 @@
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
-         :board [:x :x nil 
-                 :o :o nil 
-                 nil nil nil]}
+         :board [:x :x nil :o :o nil nil nil nil]}
         :player-2-token))))

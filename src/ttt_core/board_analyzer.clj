@@ -1,9 +1,9 @@
 (ns ttt-core.board-analyzer
-  (:require [ttt-core.board :refer [is-location-available?, default-board-size]]))
+  (:require [ttt-core.board :refer [is-location-available?, fill-location, default-board-size]]))
 
 (defn- square-position [first second size] (+ first (* second size)))
 
-(defn- straight-lines [size horizontal?]
+(defn- straight-lines [horizontal? size]
   (partition size
     (for [row (range size)
           col (range size)]
@@ -11,42 +11,37 @@
         (square-position col row size)
         (square-position row col size)))))
 
-(defn- horizontal-lines [size] (straight-lines size true))
+(def horizontal-lines (partial straight-lines true))
 
-(defn- vertical-lines [size] (straight-lines size false))
+(def vertical-lines (partial straight-lines false))
 
 (defn- on-diagonal? [row col size start-on-left?]
   (if start-on-left?
     (= row col)
     (= (+ row col) (- size 1))))
 
-(defn- diagonal-line [size start-on-left?]
+(defn- diagonal-line [start-on-left? size]
   (list (remove nil?
     (for [row (range size)
           col (range size)]
       (when (on-diagonal? row col size start-on-left?)
         (square-position col row size))))))
 
-(defn- left-diagonal-line [size] (diagonal-line size true))
+(def left-diagonal-line (partial diagonal-line true))
 
-(defn- right-diagonal-line [size] (diagonal-line size false))
+(def right-diagonal-line (partial diagonal-line false))
 
 (defn winning-lines
   ([]
     (winning-lines default-board-size))
   ([size]
-    (vec (map (fn [line] (vec line))
-      (reduce (fn [lines func] (concat lines (func size))) []
-        [horizontal-lines vertical-lines left-diagonal-line right-diagonal-line])))))
+    (vec (apply concat
+      ((juxt horizontal-lines vertical-lines left-diagonal-line right-diagonal-line) size)))))
 
 (defn empty-locations [board]
-  (vec (filter (fn [location] (is-location-available? board location))
-    (range (count board)))))
+  (vec (filter (partial is-location-available? board) (range (count board)))))
 
 (defn calculate-board-size [board] (int (Math/sqrt (count board))))
 
 (defn possible-board-states [board next-token]
-  (vec (reduce 
-    (fn [possible-boards idx]
-      (conj possible-boards (assoc board idx next-token)))
-    [] (empty-locations board))))
+  (vec (map (partial fill-location board next-token) (empty-locations board))))

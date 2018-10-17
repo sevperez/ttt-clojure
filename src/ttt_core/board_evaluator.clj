@@ -14,7 +14,10 @@
   (every? (fn [item] (or (= item token) (nil? item))) line))
 
 (defn- tokens-in-line [board winning-line]
-  (map (fn [idx] (get board idx)) winning-line))
+  (map (partial get board) winning-line))
+
+; (defn- tokens-in-line [board winning-line]
+;   (map (fn [idx] (get board idx)) winning-line))
 
 (defn- num-tokens-in-line [line token]
   (if-let [count (get (frequencies line) token)] count 0))

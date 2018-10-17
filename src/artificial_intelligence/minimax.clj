@@ -1,7 +1,7 @@
 (ns artificial-intelligence.minimax
   (:require [artificial-intelligence.ai :refer [get-other-player switch-current-token]]))
 
-(declare minimax)
+(declare minimax minimax-memo)
 
 ;; constants
 (def max-depth 3)
@@ -19,41 +19,27 @@
       ((:heuristic-score eval-fns) board test-token other-token)
       0)))
 
-(defn- maximize [eval-fns game player depth alpha beta]
+(defn- minimize-maximize-select [selection-fn eval-fns game player depth alpha beta]
   (let [board      (:board game)
         next-token ((:current-token game) game)
         boards     ((:possible-board-states eval-fns) board next-token)]
-    (loop [idx    0
-           best   min-score
-           alpha  alpha]
+    (loop [idx           0
+           best          (if (= selection-fn min) max-score min-score)
+           variable-num  (if (= selection-fn min) beta alpha)]
       (if (or (>= idx (count boards)) (<= beta alpha))
         best
         (let [next-board    (get boards idx)
               next-player   (switch-current-token game)
               updated-game  (assoc game :board next-board :current-token next-player)
-              score         (minimax eval-fns updated-game player (dec depth) alpha beta)]
+              score         (minimax-memo eval-fns updated-game player (dec depth) alpha beta)]
           (recur
             (inc idx)
-            (max best score)
-            (max alpha best score)))))))
+            (selection-fn best score)
+            (selection-fn variable-num best score)))))))
 
-(defn- minimize [eval-fns game player depth alpha beta]
-  (let [board      (:board game)
-        next-token ((:current-token game) game)
-        boards     ((:possible-board-states eval-fns) board next-token)]
-    (loop [idx  0
-           best max-score
-           beta beta]
-      (if (or (>= idx (count boards)) (<= beta alpha))
-        best
-        (let [next-board    (get boards idx)
-              next-player   (switch-current-token game)
-              updated-game  (assoc game :board next-board :current-token next-player)
-              score         (minimax eval-fns updated-game player (dec depth) alpha beta)]
-          (recur
-            (inc idx)
-            (min best score)
-            (min beta best score)))))))
+(def maximize (partial minimize-maximize-select max))
+
+(def minimize (partial minimize-maximize-select min))
 
 (defn minimize-maximize [eval-fns game player depth alpha beta]
   (let [next-token  ((:current-token game) game)]
@@ -74,3 +60,5 @@
       (if (minimax-end? (:is-leaf? eval-fns) board depth)
         (minimax-end-score eval-fns board depth test-token other-token)
         (minimize-maximize eval-fns game player depth alpha beta)))))
+
+(def minimax-memo (memoize minimax))
