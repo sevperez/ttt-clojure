@@ -78,5 +78,8 @@
       (:board (last (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play))))))))
   (testing "it returns a game history map where the last item is a draw"
     (with-out-str (is (= [:x :x :o :o :o :x :x :o :x]
-      (:board (last (with-in-str "1\n1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play)))))))))
+      (:board (last (with-in-str "1\n1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play))))))))
+  (testing "it returns a game history map where the last item is a draw in Polish"
+    (with-out-str (is (= [:x :x :o :o :o :x :x :o :x]
+      (:board (last (with-in-str "3\n2\n1\n1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play)))))))))
 

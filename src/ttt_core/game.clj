@@ -5,7 +5,7 @@
             [ttt-core.board-evaluator :refer [eval-functions]]
             [ttt-core.console :refer
               [draw-main handle-player-move-selection keyword-to-token
-               build-congratulations-message handle-game-mode-selection]]
+               build-congratulations-message handle-game-setup]]
             [artificial-intelligence.ai :refer [choose-move] :as ai]
             [artificial-intelligence.minimax :refer [minimax-memo] :as mm]))
 
@@ -49,7 +49,7 @@
       (ai-move game))))
 
 (defn play []
-  (loop [game     (handle-game-mode-selection (initialize-game))
+  (loop [game     (handle-game-setup (initialize-game))
          history  [game]]
     (if (is-game-over? (:board game))
       (do 

@@ -34,7 +34,7 @@
       (with-out-str
         (draw-board [nil :x nil :x nil nil nil :o nil]))))))
 
-(deftest handle-game-mode-selection-test
+(deftest handle-game-setup-test
   (testing "it returns a game with :game-mode set to :human-vs-human with valid input"
     (with-out-str (is 
       (= {:language :en
@@ -44,7 +44,7 @@
           :player-2-token :o
           :board [nil nil nil nil nil nil nil nil nil]}
         (with-in-str "1"
-          (handle-game-mode-selection
+          (handle-game-setup
             {:language :en
              :game-mode nil
              :current-token :player-1-token
@@ -60,7 +60,7 @@
           :player-2-token :o
           :board [nil nil nil nil nil nil nil nil nil]}
         (with-in-str "2"
-          (handle-game-mode-selection
+          (handle-game-setup
             {:language :en
              :game-mode nil
              :current-token :player-1-token
@@ -68,10 +68,10 @@
              :player-2-token :o
              :board [nil nil nil nil nil nil nil nil nil]})))))))
 
-(deftest get-game-mode-selection-test
+(deftest get-game-setup-selection-test
   (testing "it returns :human-vs-human if player selects a human vs. human game"
     (with-out-str (is (= :human-vs-human (with-in-str "1" 
-      (get-game-mode-selection
+      (get-game-setup-selection
         {:language :en
          :game-mode nil
          :current-token :player-1-token
@@ -80,7 +80,7 @@
          :board [nil nil nil nil nil nil nil nil nil]}))))))
   (testing "it returns :human-vs-computer if player selects a human vs. computer game"
     (with-out-str (is (= :human-vs-computer (with-in-str "2" 
-      (get-game-mode-selection
+      (get-game-setup-selection
         {:language :en
          :game-mode nil
          :current-token :player-1-token
@@ -89,7 +89,7 @@
          :board [nil nil nil nil nil nil nil nil nil]}))))))
   (testing "it continues requesting input until it's valid"
     (with-out-str (is (= :human-vs-human (with-in-str "4\na\nX\n1"
-      (get-game-mode-selection
+      (get-game-setup-selection
         {:language :en
          :game-mode nil
          :current-token :player-1-token
@@ -97,19 +97,19 @@
          :player-2-token :o
          :board [nil nil nil nil nil nil nil nil nil]})))))))
 
-(deftest build-choose-game-mode-string-test
-  (testing "it returns a default choose game mode message"
+(deftest build-choose-game-setup-string-test
+  (testing "it returns a default choose game setup message"
     (is (= "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)"
-      (build-choose-game-mode-string :en))))
-  (testing "it returns a choose game mode message in :pl if language is set to :pl"
+      (build-choose-game-setup-string :en))))
+  (testing "it returns a choose game setup message in :pl if language is set to :pl"
     (is (= "Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)"
-      (build-choose-game-mode-string :pl))))
-  (testing "it optionally returns a choose game mode message with a prepended argument string in :en"
+      (build-choose-game-setup-string :pl))))
+  (testing "it optionally returns a choose game setup message with a prepended argument string in :en"
     (is (= "Invalid selection. Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)"
-      (build-choose-game-mode-string :en "Invalid selection."))))
-  (testing "it optionally returns a choose game mode message with a prepended argument in :pl"
+      (build-choose-game-setup-string :en "Invalid selection."))))
+  (testing "it optionally returns a choose game setup message with a prepended argument in :pl"
     (is (= "Nieprawidłowy wybór. Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)"
-      (build-choose-game-mode-string :pl "Nieprawidłowy wybór.")))))
+      (build-choose-game-setup-string :pl "Nieprawidłowy wybór.")))))
 
 (deftest handle-player-move-selection-test
   (testing "it returns an integer that is adjusted to match the zero-indexed board"
@@ -291,3 +291,66 @@
   (testing "it returns a tie string if winner is nil in :pl"
     (is (= "Ta gra zakończyła się remis!"
       (build-congratulations-message nil :pl)))))
+
+(deftest handle-language-selection-test
+  (testing "it returns a game with :language set to :en with valid input"
+    (with-out-str (is 
+      (= {:language :en
+          :game-mode :human-vs-human
+          :current-token :player-1-token
+          :player-1-token :x
+          :player-2-token :o
+          :board [nil nil nil nil nil nil nil nil nil]}
+        (with-in-str "1"
+          (handle-language-selection
+            {:language :en
+             :game-mode :human-vs-human
+             :current-token :player-1-token
+             :player-1-token :x
+             :player-2-token :o
+             :board [nil nil nil nil nil nil nil nil nil]}))))))
+  (testing "it returns a game with :language set to :pl with valid input"
+    (with-out-str (is 
+      (= {:language :pl
+          :game-mode :human-vs-human
+          :current-token :player-1-token
+          :player-1-token :x
+          :player-2-token :o
+          :board [nil nil nil nil nil nil nil nil nil]}
+        (with-in-str "2"
+          (handle-language-selection
+            {:language :en
+             :game-mode :human-vs-human
+             :current-token :player-1-token
+             :player-1-token :x
+             :player-2-token :o
+             :board [nil nil nil nil nil nil nil nil nil]})))))))
+
+(deftest get-language-selection-test
+  (testing "it returns :en if player selects English"
+    (with-out-str (is (= :en (with-in-str "1" 
+      (get-language-selection
+        {:language :en
+         :game-mode nil
+         :current-token :player-1-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [nil nil nil nil nil nil nil nil nil]}))))))
+  (testing "it returns :pl if player selects Polish"
+    (with-out-str (is (= :pl (with-in-str "2" 
+      (get-language-selection
+        {:language :en
+         :game-mode nil
+         :current-token :player-1-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [nil nil nil nil nil nil nil nil nil]}))))))
+  (testing "it continues requesting input until it's valid"
+    (with-out-str (is (= :en (with-in-str "4\na\nX\n1"
+      (get-language-selection
+        {:language :en
+         :game-mode nil
+         :current-token :player-1-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [nil nil nil nil nil nil nil nil nil]})))))))

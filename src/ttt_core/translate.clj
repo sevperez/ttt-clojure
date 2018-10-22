@@ -7,11 +7,13 @@
 (def dictionary
   {:en
     {:missing ":en missing text"
-     :choose-game-mode "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)"
+     :choose-game-setup "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)"
+     :choose-language-setup "Choose a language:\n1. English\n2. Polish"
      :choose-move-string "Choose a move:"
      :computer-string "Computer"
      :congratulations-string "Congratulations! %1 won the game!"
-     :game-mode-selection-header "--- Game Mode Selection ---"
+     :game-setup-selection-header "--- Game Mode Selection ---"
+     :game-language-selection-header "--- Langauge Selection ---"
      :invalid-entry "Invalid entry."
      :invalid-selection "Invalid selection."
      :invalid-move "You've entered an invalid move."
@@ -21,12 +23,14 @@
      :title "Tic Tac Toe"
      :unavailable-entry "Unavailable entry."}
    :pl
-    {:missing ":es texto faltante"
-     :choose-game-mode "Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)"
+    {:missing ":pl brakujący tekst"
+     :choose-game-setup "Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)"
+     :choose-language-setup "Wybierz język:\n1. angielski\n2. polski"
      :choose-move-string "Wybierz ruch:"
      :computer-string "Komputer"
      :congratulations-string "Gratulacje! %1 wygrał!"
-     :game-mode-selection-header "--- Wybór trybu gry ---"
+     :game-setup-selection-header "--- Wybór trybu gry ---"
+     :game-language-selection-header "--- Wybór języka ---"
      :invalid-entry "Niewłaściwy wpis."
      :invalid-selection "Nieprawidłowy wybór."
      :invalid-move "Wprowadziłeś nieprawidłowy ruch."
