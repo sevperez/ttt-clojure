@@ -30,5 +30,5 @@
 (deftest fill-location-test
   (testing "return a board with the provided location filled")
     (is (= [:x :x nil :o :o nil nil nil :x]
-      (fill-location [:x :x nil :o :o nil nil nil nil] 8 :x))))
+      (fill-location [:x :x nil :o :o nil nil nil nil] :x 8))))
       
