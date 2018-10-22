@@ -1,6 +1,7 @@
 (ns ttt-core.console 
   (:require [clojure.string :as s]
-            [ttt-core.rules :refer [is-move-valid?]]))
+            [ttt-core.rules :refer [is-move-valid?]]
+            [ttt-core.translate :refer [translate]]))
 
 (def board-shape 
   (str "          |     |     \n"
@@ -39,18 +40,23 @@
 (defn- clear-terminal []
   (do (print "\u001b[2J") (print "\u001B[0;0f")))
 
-(defn- draw-header []
-  (println "---------------------------\nTic Tac Toe\n---------------------------"))
+(defn- draw-header [language]
+  (println 
+    (str "---------------------------\n" 
+      (translate [language] [:title]) 
+      "\n---------------------------")))
 
 (defn draw-player-info [game]
-  (let [mode    (:game-mode game)
-        token-1 (keyword-to-token (:player-1-token game))
-        token-2 (keyword-to-token (:player-2-token game))]
+  (let [mode            (:game-mode game)
+        token-1         (keyword-to-token (:player-1-token game))
+        token-2         (keyword-to-token (:player-2-token game))
+        player-string   (translate [(:language game)] [:player-string])
+        computer-string (translate [(:language game)] [:computer-string])]
     (cond
       (= :human-vs-human mode)
-        (println (str "Player 1 (" token-1 ")     Player 2 (" token-2 ")\n"))
+        (println (str  player-string " 1 (" token-1 ")     " player-string " 2 (" token-2 ")\n"))
       (= :human-vs-computer mode)
-        (println (str "Player (" token-1 ")     Computer (" token-2 ")\n"))
+        (println (str player-string " (" token-1 ")     " computer-string " (" token-2 ")\n"))
       :else (println "******* (X)     ******* (O)\n"))))
 
 (defn- draw-footer []
@@ -59,42 +65,46 @@
 (defn draw-main [game message]
   (do
     (clear-terminal)
-    (draw-header)
+    (draw-header (:language game))
     (draw-player-info game)
     (draw-board (:board game))
     (println message)
     (draw-footer)))
 
 (defn build-choose-game-mode-string 
-  ([] (build-choose-game-mode-string ""))
-  ([message]
-    (str message "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer")))
+  ([language] (build-choose-game-mode-string language ""))
+  ([language message]
+    (str message (if (= "" message) "" " ") (translate [language] [:choose-game-mode]))))
 
 (defn request-game-mode
   ([game] (request-game-mode game ""))
   ([game message]
     (let [modes {:1 :human-vs-human :2 :human-vs-computer}]
       (do
-        (draw-main game "--- Game Mode Selection ---")
-        (println (build-choose-game-mode-string message))
+        (draw-main game (translate [(:language game)] [:game-mode-selection-header]))
+        (println (build-choose-game-mode-string (:language game) message))
         (get modes (keyword (read-line)))))))
 
 (defn get-game-mode-selection [game] 
   (loop [selection (request-game-mode game)]
     (if (not (nil? selection))
       selection
-      (recur (request-game-mode game "Invalid selection. ")))))
+      (recur (request-game-mode game (translate [(:language game)] [:invalid-selection]))))))
 
 (defn handle-game-mode-selection [game]
   (assoc game :game-mode (get-game-mode-selection game)))
 
-(defn current-player-name [current-player-token game-mode]
-  (if (= game-mode :human-vs-human)
-    (if (= current-player-token :player-1-token) "Player 1" "Player 2")
-    (if (= current-player-token :player-1-token) "Player" "Computer")))
+(defn current-player-name [current-player-token game-mode language]
+  (let [player-string   (translate [language] [:player-string])
+        computer-string (translate [language] [:computer-string])]
+    (if (= game-mode :human-vs-human)
+      (if (= current-player-token :player-1-token) 
+        (str player-string " 1") 
+        (str player-string " 2"))
+      (if (= current-player-token :player-1-token) player-string computer-string))))
 
-(defn build-current-player-string [name]
-  (str name "'s move!"))
+(defn build-current-player-string [name language]
+  (translate [language] [:move-string] [name]))
 
 (defn- get-index-adjusted-input [] (dec (Integer/parseInt (read-line))))
 
@@ -102,7 +112,7 @@
   (let [input (get-index-adjusted-input)]
     (if (is-move-valid? (:board game) input) 
       input
-      (throw (ex-info "You've entered an invalid move." {})))))
+      (throw (ex-info (translate [(:language game)] [:invalid-move]) {})))))
 
 (defn- get-available-indices [board]
   (loop [index  0
@@ -114,7 +124,8 @@
         (recur (inc index) result)))))
 
 (defn build-choose-move-string [game]
-  (str "Choose a move: (" (s/join ", " (get-available-indices (:board game))) ")"))
+  (str (translate [(:language game)] [:choose-move-string]) 
+    " (" (s/join ", " (get-available-indices (:board game))) ")"))
 
 (defn handle-player-move-selection
   ([game]
@@ -123,14 +134,19 @@
     (do
       (draw-main game
         (build-current-player-string
-          (current-player-name (:current-token game) (:game-mode game))))
+          (current-player-name (:current-token game) (:game-mode game) (:language game))
+          (:language game)))
       (println message))
     (try 
       (get-player-move-selection game)
       (catch NumberFormatException e 
-        (handle-player-move-selection game (str "Invalid entry. " (build-choose-move-string game))))
+        (handle-player-move-selection game (str 
+          (translate [(:language game)] [:invalid-entry]) " " (build-choose-move-string game))))
       (catch clojure.lang.ExceptionInfo e
-        (handle-player-move-selection game (str "Unavailable entry. " (build-choose-move-string game)))))))
+        (handle-player-move-selection game (str 
+          (translate [(:language game)] [:unavailable-entry]) " " (build-choose-move-string game)))))))
 
-(defn build-congratulations-message [token]
-  (str "Congratulations! " (keyword-to-token token) " won the game!"))
+(defn build-congratulations-message [token language]
+  (if (nil? token)
+    (translate [language] [:tie-string])
+    (translate [language] [:congratulations-string] [(keyword-to-token token)])))

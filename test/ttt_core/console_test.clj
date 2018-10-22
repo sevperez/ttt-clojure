@@ -88,7 +88,7 @@
          :player-2-token :o
          :board [nil nil nil nil nil nil nil nil nil]}))))))
   (testing "it continues requesting input until it's valid"
-    (with-out-str (is (= :human-vs-human (with-in-str "3\na\nX\n1"
+    (with-out-str (is (= :human-vs-human (with-in-str "4\na\nX\n1"
       (get-game-mode-selection
         {:language :en
          :game-mode nil
@@ -99,11 +99,17 @@
 
 (deftest build-choose-game-mode-string-test
   (testing "it returns a default choose game mode message"
-    (is (= "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer"
-      (build-choose-game-mode-string))))
-  (testing "it optionally returns a choose game mode message with a prepended argument string"
-    (is (= "Invalid selection. Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer"
-      (build-choose-game-mode-string "Invalid selection. ")))))
+    (is (= "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)"
+      (build-choose-game-mode-string :en))))
+  (testing "it returns a choose game mode message in :pl if language is set to :pl"
+    (is (= "Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)"
+      (build-choose-game-mode-string :pl))))
+  (testing "it optionally returns a choose game mode message with a prepended argument string in :en"
+    (is (= "Invalid selection. Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)"
+      (build-choose-game-mode-string :en "Invalid selection."))))
+  (testing "it optionally returns a choose game mode message with a prepended argument in :pl"
+    (is (= "Nieprawidłowy wybór. Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)"
+      (build-choose-game-mode-string :pl "Nieprawidłowy wybór.")))))
 
 (deftest handle-player-move-selection-test
   (testing "it returns an integer that is adjusted to match the zero-indexed board"
@@ -160,7 +166,7 @@
            :board [:x nil nil nil nil nil nil nil nil]}))))))
 
 (deftest draw-player-info-test 
-  (testing "it returns a string with the human-vs-human player names and tokens"
+  (testing "it returns a string with the human-vs-human player names and tokens in :en"
     (is (= "Player 1 (X)     Player 2 (O)\n\n" 
       (with-out-str (draw-player-info
         {:language :en
@@ -169,10 +175,28 @@
          :player-1-token :x
          :player-2-token :o
          :board [:x :o nil :x :o nil :x nil nil]})))))
-  (testing "it returns a string with the human-vs-computer player names and tokens"
+  (testing "it returns a string with the human-vs-human player names and tokens in :pl"
+    (is (= "Gracz 1 (X)     Gracz 2 (O)\n\n" 
+      (with-out-str (draw-player-info
+        {:language :pl
+         :game-mode :human-vs-human
+         :current-token :player-1-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [:x :o nil :x :o nil :x nil nil]})))))
+  (testing "it returns a string with the human-vs-computer player names and tokens in :en"
     (is (= "Player (X)     Computer (O)\n\n" 
       (with-out-str (draw-player-info
         {:language :en
+         :game-mode :human-vs-computer
+         :current-token :player-1-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [:x :o nil :x :o nil :x nil nil]})))))
+  (testing "it returns a string with the human-vs-computer player names and tokens in :pl"
+    (is (= "Gracz (X)     Komputer (O)\n\n" 
+      (with-out-str (draw-player-info
+        {:language :pl
          :game-mode :human-vs-computer
          :current-token :player-1-token
          :player-1-token :x
@@ -189,20 +213,29 @@
          :board [:x :o nil :x :o nil :x nil nil]}))))))
 
 (deftest current-player-name-test
-  (testing "it returns the correct current player name in a human-vs-human game"
-    (is (= "Player 1" (current-player-name :player-1-token :human-vs-human)))
-    (is (= "Player 2" (current-player-name :player-2-token :human-vs-human))))
+  (testing "it returns the correct current player name in a human-vs-human game in :en"
+    (is (= "Player 1" (current-player-name :player-1-token :human-vs-human :en)))
+    (is (= "Player 2" (current-player-name :player-2-token :human-vs-human :en))))
+  (testing "it returns the correct current player name in a human-vs-human game in :pl"
+    (is (= "Gracz 1" (current-player-name :player-1-token :human-vs-human :pl)))
+    (is (= "Gracz 2" (current-player-name :player-2-token :human-vs-human :pl))))
   (testing "it returns the correct current player name in a human-vs-computer game"
-    (is (= "Player" (current-player-name :player-1-token :human-vs-computer)))
-    (is (= "Computer" (current-player-name :player-2-token :human-vs-computer)))))
+    (is (= "Player" (current-player-name :player-1-token :human-vs-computer :en)))
+    (is (= "Computer" (current-player-name :player-2-token :human-vs-computer :en))))
+  (testing "it returns the correct current player name in a human-vs-computer game"
+    (is (= "Gracz" (current-player-name :player-1-token :human-vs-computer :pl)))
+    (is (= "Komputer" (current-player-name :player-2-token :human-vs-computer :pl)))))
 
 (deftest build-current-player-string-test
-  (testing "it returns a string with the current player info in human-vs-human"
-    (is (= "Player 1's move!" (build-current-player-string "Player 1")))
-    (is (= "Player 2's move!" (build-current-player-string "Player 2")))))
+  (testing "it returns a string with the current player info in human-vs-human in :en"
+    (is (= "Player 1's move!" (build-current-player-string "Player 1" :en)))
+    (is (= "Player 2's move!" (build-current-player-string "Player 2" :en))))
+  (testing "it returns a string with the current player info in human-vs-human in :pl"
+    (is (= "Ruch Gracza 1!" (build-current-player-string "Gracz 1" :pl)))
+    (is (= "Ruch Gracza 2!" (build-current-player-string "Gracz 2" :pl)))))
 
 (deftest build-choose-move-string-test
-  (testing "it returns a string listing all 9 spaces available on empty board"
+  (testing "it returns a string listing all 9 spaces available on empty board in :en"
     (is (= "Choose a move: (1, 2, 3, 4, 5, 6, 7, 8, 9)"
       (build-choose-move-string
         {:language :en
@@ -211,7 +244,16 @@
          :player-1-token :x
          :player-2-token :o
          :board [nil nil nil nil nil nil nil nil nil]}))))
-  (testing "it returns a string listing only available spaces"
+  (testing "it returns a string listing all 9 spaces available on empty board in :pl"
+    (is (= "Wybierz ruch: (1, 2, 3, 4, 5, 6, 7, 8, 9)"
+      (build-choose-move-string
+        {:language :pl
+         :game-mode :human-vs-human
+         :current-token :player-2-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [nil nil nil nil nil nil nil nil nil]}))))
+  (testing "it returns a string listing only available spaces in :en"
     (is (= "Choose a move: (3, 6, 8, 9)"
       (build-choose-move-string
         {:language :en
@@ -219,12 +261,33 @@
          :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
+         :board [:x :o nil :x :x nil :o nil nil]}))))
+  (testing "it returns a string listing only available spaces in :pl"
+    (is (= "Wybierz ruch: (3, 6, 8, 9)"
+      (build-choose-move-string
+        {:language :pl
+         :game-mode :human-vs-human
+         :current-token :player-2-token
+         :player-1-token :x
+         :player-2-token :o
          :board [:x :o nil :x :x nil :o nil nil]})))))
 
 (deftest build-congratulations-message-test 
-  (testing "it returns a string to congratulate the player with the :x token"
+  (testing "it returns a string to congratulate the player with the :x token in :en"
     (is (= "Congratulations! X won the game!"
-      (build-congratulations-message :x))))
-  (testing "it returns a string to congratulate the player with the :o token"
+      (build-congratulations-message :x :en))))
+  (testing "it returns a string to congratulate the player with the :x token in :pl"
+    (is (= "Gratulacje! X wygrał!"
+      (build-congratulations-message :x :pl))))
+  (testing "it returns a string to congratulate the player with the :o token in :en"
     (is (= "Congratulations! O won the game!"
-      (build-congratulations-message :o)))))
+      (build-congratulations-message :o :en))))
+  (testing "it returns a string to congratulate the player with the :o token in :pl"
+    (is (= "Gratulacje! O wygrał!"
+      (build-congratulations-message :o :pl))))
+  (testing "it returns a tie string if winner is nil in :en"
+    (is (= "This game ended in a tie!"
+      (build-congratulations-message nil :en))))
+  (testing "it returns a tie string if winner is nil in :pl"
+    (is (= "Ta gra zakończyła się remis!"
+      (build-congratulations-message nil :pl)))))

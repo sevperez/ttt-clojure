@@ -36,9 +36,7 @@
 
 (defn get-game-end-message [game]
   (let [winner (get-winning-token (:board game))]
-    (if winner
-      (build-congratulations-message winner)
-      "This game ended in a tie!")))
+    (build-congratulations-message winner (:language game))))
 
 (defn- ai-move [game]
   (ai/choose-move eval-functions mm/minimax-memo game :player-2-token))
