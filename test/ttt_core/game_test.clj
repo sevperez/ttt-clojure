@@ -4,7 +4,8 @@
 
 (deftest initialize-game-test
   (testing "returns a default game map that has a board"
-    (is (= {:game-mode nil
+    (is (= {:language :en
+            :game-mode nil
             :current-token :player-1-token
             :player-1-token :x
             :player-2-token :o
@@ -13,20 +14,23 @@
 
 (deftest update-game-test
   (testing "returns an updated game map if valid move input"
-    (is (= {:game-mode :human-vs-human
+    (is (= {:language :en
+            :game-mode :human-vs-human
             :current-token :player-2-token
             :player-1-token :x
             :player-2-token :o
             :board [nil nil nil nil :x nil nil  nil nil]}
       (update-game (assoc (initialize-game) :game-mode :human-vs-human) 4))))
   (testing "returns an identical game map if move input is invalid"
-    (is (= {:game-mode :human-vs-human
+    (is (= {:language :en
+            :game-mode :human-vs-human
             :current-token :player-2-token
             :player-1-token :x
             :player-2-token :o
             :board [:x :o nil nil :x nil nil  nil nil]}
       (update-game
-        {:game-mode :human-vs-human
+        {:language :en
+         :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
@@ -37,7 +41,8 @@
   (testing "it returns an appropriate message if player 1 wins"
     (is (= "Congratulations! X won the game!"
       (get-game-end-message
-        {:game-mode :human-vs-human
+        {:language :en
+         :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
@@ -45,7 +50,8 @@
   (testing "it returns an appropriate message if player 2 wins"
     (is (= "Congratulations! O won the game!"
       (get-game-end-message
-        {:game-mode :human-vs-human
+        {:language :en
+         :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
@@ -53,7 +59,8 @@
   (testing "it returns a draw message if there is no winner"
     (is (= "This game ended in a tie!"
       (get-game-end-message
-        {:game-mode :human-vs-human
+        {:language :en
+         :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o

@@ -7,7 +7,8 @@
   (testing "it returns max-score if board is leaf and player is winner"
     (is (= max-score 
       (minimax ttt-eval/eval-functions
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
@@ -16,7 +17,8 @@
   (testing "it returns min-score if board is leaf and opponent is winner"
     (is (= min-score
       (minimax ttt-eval/eval-functions
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
@@ -25,7 +27,8 @@
   (testing "it returns heuristic score if board is not leaf and depth is 0"
     (is (= 40
       (minimax ttt-eval/eval-functions
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
@@ -34,7 +37,8 @@
   (testing "it returns max-score if guaranteed win"
     (is (= max-score
       (minimax ttt-eval/eval-functions
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
@@ -45,7 +49,8 @@
   (testing "it returns min-score if guaranteed loss"
     (is (= min-score
       (minimax ttt-eval/eval-functions
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-1-token
          :player-1-token :o
          :player-2-token :x
@@ -54,7 +59,8 @@
   (testing "it returns zero if guaranteed draw"
     (is (= 0
       (minimax ttt-eval/eval-functions
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x

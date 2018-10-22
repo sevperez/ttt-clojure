@@ -10,7 +10,8 @@
             [artificial-intelligence.minimax :refer [minimax-memo] :as mm]))
 
 (defn initialize-game [] 
-  {:game-mode nil
+  {:language :en
+   :game-mode nil
    :current-token :player-1-token
    :player-1-token :x
    :player-2-token :o

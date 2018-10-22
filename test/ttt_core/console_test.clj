@@ -37,28 +37,32 @@
 (deftest handle-game-mode-selection-test
   (testing "it returns a game with :game-mode set to :human-vs-human with valid input"
     (with-out-str (is 
-      (= {:game-mode :human-vs-human
+      (= {:language :en
+          :game-mode :human-vs-human
           :current-token :player-1-token
           :player-1-token :x
           :player-2-token :o
           :board [nil nil nil nil nil nil nil nil nil]}
         (with-in-str "1"
           (handle-game-mode-selection
-            {:game-mode nil
+            {:language :en
+             :game-mode nil
              :current-token :player-1-token
              :player-1-token :x
              :player-2-token :o
              :board [nil nil nil nil nil nil nil nil nil]}))))))
   (testing "it returns a game with :game-mode set to :human-vs-computer with valid input"
     (with-out-str (is 
-      (= {:game-mode :human-vs-computer
+      (= {:language :en
+          :game-mode :human-vs-computer
           :current-token :player-1-token
           :player-1-token :x
           :player-2-token :o
           :board [nil nil nil nil nil nil nil nil nil]}
         (with-in-str "2"
           (handle-game-mode-selection
-            {:game-mode nil
+            {:language :en
+             :game-mode nil
              :current-token :player-1-token
              :player-1-token :x
              :player-2-token :o
@@ -68,7 +72,8 @@
   (testing "it returns :human-vs-human if player selects a human vs. human game"
     (with-out-str (is (= :human-vs-human (with-in-str "1" 
       (get-game-mode-selection
-        {:game-mode nil
+        {:language :en
+         :game-mode nil
          :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
@@ -76,7 +81,8 @@
   (testing "it returns :human-vs-computer if player selects a human vs. computer game"
     (with-out-str (is (= :human-vs-computer (with-in-str "2" 
       (get-game-mode-selection
-        {:game-mode nil
+        {:language :en
+         :game-mode nil
          :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
@@ -84,7 +90,8 @@
   (testing "it continues requesting input until it's valid"
     (with-out-str (is (= :human-vs-human (with-in-str "3\na\nX\n1"
       (get-game-mode-selection
-        {:game-mode nil
+        {:language :en
+         :game-mode nil
          :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
@@ -103,7 +110,8 @@
     (with-out-str (is 
       (= 4 (with-in-str "5"
         (handle-player-move-selection
-          {:game-mode :human-vs-human
+          {:language :en
+           :game-mode :human-vs-human
            :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
@@ -112,7 +120,8 @@
     (with-out-str (is 
       (= 4 (with-in-str "20\n5"
         (handle-player-move-selection
-          {:game-mode :human-vs-human
+          {:language :en
+           :game-mode :human-vs-human
            :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
@@ -123,7 +132,8 @@
     (is (= 5 
       (with-in-str "6" 
         (get-player-move-selection
-          {:game-mode :human-vs-human
+          {:language :en
+           :game-mode :human-vs-human
            :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
@@ -132,7 +142,8 @@
     (is (thrown? NumberFormatException 
       (with-in-str "a" 
         (get-player-move-selection
-          {:game-mode :human-vs-human
+          {:language :en
+           :game-mode :human-vs-human
            :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
@@ -141,7 +152,8 @@
     (is (thrown? clojure.lang.ExceptionInfo
       (with-in-str "1"
         (get-player-move-selection
-          {:game-mode :human-vs-human
+          {:language :en
+           :game-mode :human-vs-human
            :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
@@ -151,7 +163,8 @@
   (testing "it returns a string with the human-vs-human player names and tokens"
     (is (= "Player 1 (X)     Player 2 (O)\n\n" 
       (with-out-str (draw-player-info
-        {:game-mode :human-vs-human
+        {:language :en
+         :game-mode :human-vs-human
          :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
@@ -159,7 +172,8 @@
   (testing "it returns a string with the human-vs-computer player names and tokens"
     (is (= "Player (X)     Computer (O)\n\n" 
       (with-out-str (draw-player-info
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
@@ -167,7 +181,8 @@
   (testing "it returns a default string if game mode has not yet been set"
     (is (= "******* (X)     ******* (O)\n\n" 
       (with-out-str (draw-player-info
-        {:game-mode nil
+        {:language :en
+         :game-mode nil
          :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
@@ -190,7 +205,8 @@
   (testing "it returns a string listing all 9 spaces available on empty board"
     (is (= "Choose a move: (1, 2, 3, 4, 5, 6, 7, 8, 9)"
       (build-choose-move-string
-        {:game-mode :human-vs-human
+        {:language :en
+         :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
@@ -198,7 +214,8 @@
   (testing "it returns a string listing only available spaces"
     (is (= "Choose a move: (3, 6, 8, 9)"
       (build-choose-move-string
-        {:game-mode :human-vs-human
+        {:language :en
+         :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o

@@ -15,7 +15,8 @@
             {:location 5 :score -1000}
             {:location 8 :score -1000}]
       (all-move-options ttt-eval/eval-functions mm/minimax
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
@@ -37,7 +38,8 @@
   (testing "it returns index of a winning move if available"
     (is (= 2
       (choose-move ttt-eval/eval-functions mm/minimax
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
@@ -46,7 +48,8 @@
   (testing "it returns index of a blocking move if loss imminent"
     (is (= 8
       (choose-move ttt-eval/eval-functions mm/minimax
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
@@ -55,7 +58,8 @@
   (testing "it preferentially returns a winning move over a blocking move"
     (is (= 2
       (choose-move ttt-eval/eval-functions mm/minimax
-        {:game-mode :human-vs-computer
+        {:language :en
+         :game-mode :human-vs-computer
          :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
