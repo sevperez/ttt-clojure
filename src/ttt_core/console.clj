@@ -71,55 +71,46 @@
     (println message)
     (draw-footer)))
 
-(defn build-choose-language-string 
-  ([language] (build-choose-language-string language ""))
-  ([language message]
-    (str message (if (= "" message) "" " ") (translate [language] [:choose-language-setup]))))
-
-(defn request-language-setup
-  ([game] (request-language-setup game ""))
-  ([game message]
-    (let [opts {:1 :en :2 :pl}]
-      (do
-        (draw-main game (translate [(:language game)] [:game-language-selection-header]))
-        (println (build-choose-language-string (:language game) message))
-        (get opts (keyword (read-line)))))))
-
-(defn get-language-selection [game]
-  (loop [selection (request-language-setup game)]
-    (if (not (nil? selection))
-      selection
-      (recur (request-language-setup game (translate [(:language game)] [:invalid-selection]))))))
-
-(defn handle-language-selection [game]
-  (assoc game :language (get-language-selection game)))
-
-(defn build-choose-game-setup-string 
-  ([language] (build-choose-game-setup-string language ""))
-  ([language message]
-    (str message (if (= "" message) "" " ") (translate [language] [:choose-game-setup]))))
-
+(defn build-selection-string 
+  ([language msg-keyword] (build-selection-string language msg-keyword ""))
+  ([language msg-keyword prepend-msg]
+    (str prepend-msg
+      (if (= "" prepend-msg) "" " ")
+      (translate [language] [msg-keyword]))))
+        
 (defn request-game-setup
   ([game] (request-game-setup game ""))
-  ([game message]
+  ([game prepend-msg]
     (let [opts {:1 :human-vs-human :2 :human-vs-computer :3 :language-setup}]
       (do
         (draw-main game (translate [(:language game)] [:game-setup-selection-header]))
-        (println (build-choose-game-setup-string (:language game) message))
+        (println (build-selection-string (:language game) :choose-game-setup prepend-msg))
         (get opts (keyword (read-line)))))))
 
-(defn get-game-setup-selection [game] 
-  (loop [selection (request-game-setup game)]
+(defn request-language-setup
+  ([game] (request-language-setup game ""))
+  ([game prepend-msg]
+    (let [opts {:1 :en :2 :pl}]
+      (do
+        (draw-main game (translate [(:language game)] [:game-language-selection-header]))
+        (println (build-selection-string (:language game) :choose-language-setup prepend-msg))
+        (get opts (keyword (read-line)))))))
+
+(defn get-selection [game request-fn] 
+  (loop [selection (request-fn game)]
     (if (not (nil? selection))
       selection
-      (recur (request-game-setup game (translate [(:language game)] [:invalid-selection]))))))
+      (recur (request-fn game (translate [(:language game)] [:invalid-selection]))))))
+
+(defn handle-language-selection [game]
+  (assoc game :language (get-selection game request-language-setup)))
 
 (defn handle-game-setup [game]
   (loop [game      game
-         selection (get-game-setup-selection game)]
+         selection (get-selection game request-game-setup)]
     (if (= :language-setup selection)
       (let [updated-game (handle-language-selection game)]
-        (recur updated-game (get-game-setup-selection updated-game)))
+        (recur updated-game (get-selection updated-game request-game-setup)))
       (assoc game :game-mode selection))))
 
 (defn current-player-name [current-player-token game-mode language]
