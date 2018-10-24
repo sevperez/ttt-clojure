@@ -5,12 +5,13 @@
             [ttt-core.board-evaluator :refer [eval-functions]]
             [ttt-core.console :refer
               [draw-main handle-player-move-selection keyword-to-token
-               build-congratulations-message handle-game-mode-selection]]
+               build-congratulations-message handle-game-setup]]
             [artificial-intelligence.ai :refer [choose-move] :as ai]
             [artificial-intelligence.minimax :refer [minimax-memo] :as mm]))
 
 (defn initialize-game [] 
-  {:game-mode nil
+  {:language :en
+   :game-mode nil
    :current-token :player-1-token
    :player-1-token :x
    :player-2-token :o
@@ -35,9 +36,7 @@
 
 (defn get-game-end-message [game]
   (let [winner (get-winning-token (:board game))]
-    (if winner
-      (build-congratulations-message winner)
-      "This game ended in a tie!")))
+    (build-congratulations-message winner (:language game))))
 
 (defn- ai-move [game]
   (ai/choose-move eval-functions mm/minimax-memo game :player-2-token))
@@ -50,7 +49,7 @@
       (ai-move game))))
 
 (defn play []
-  (loop [game     (handle-game-mode-selection (initialize-game))
+  (loop [game     (handle-game-setup (initialize-game))
          history  [game]]
     (if (is-game-over? (:board game))
       (do 
