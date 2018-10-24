@@ -6,7 +6,8 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [com.taoensso/tempura "1.2.1"]
                  [com.novemberain/monger "3.1.0"]
-                 [tortue/spy "1.4.0"]]
+                 [tortue/spy "1.4.0"]
+                 [org.slf4j/slf4j-nop "1.7.12"]]
   :main ^:skip-aot ttt-core.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
