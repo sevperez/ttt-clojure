@@ -8,15 +8,18 @@
                build-congratulations-message handle-game-setup]]
             [artificial-intelligence.ai :refer [choose-move] :as ai]
             [artificial-intelligence.minimax :refer [minimax-memo] :as mm]
-            [persistence.db :refer [save] :as db]))
+            [persistence.db :refer [save generate-uuid] :as db]))
 
-(defn initialize-game [] 
-  {:language :en
-   :game-mode nil
-   :current-token :player-1-token
-   :player-1-token :x
-   :player-2-token :o
-   :board [nil nil nil nil nil nil nil  nil nil]})
+(defn initialize-game
+  ([] (initialize-game (generate-uuid)))
+  ([id] 
+    {:_id id
+     :language :en
+     :game-mode nil
+     :current-token :player-1-token
+     :player-1-token :x
+     :player-2-token :o
+     :board [nil nil nil nil nil nil nil  nil nil]}))
 
 (defn- update-current-player [game]
   (assoc game :current-token
@@ -52,9 +55,11 @@
 (defn play []
   (loop [game     (handle-game-setup (initialize-game))
          history  [game]]
-    (if (is-game-over? (:board game))
-      (do 
-        (draw-main game (get-game-end-message game))
-        history)
-      (let [new-game (update-game game (get-next-move game))]
-        (recur new-game (conj history new-game))))))
+    (do
+      (save history)
+      (if (is-game-over? (:board game))
+        (do 
+          (draw-main game (get-game-end-message game))
+          history)
+        (let [new-game (update-game game (get-next-move game))]
+          (recur new-game (conj history new-game)))))))

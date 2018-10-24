@@ -26,4 +26,4 @@
   (let [conn      (mg/connect)
         db        (mg/get-db conn "ttt-clojure")
         game-doc  (build-game-doc game-history)]
-    (mc/update db "games" {:_id (:_id game-doc)} game-doc {:upsert true})))
+    (mc/update db "games" {:_id (:_id game-doc)} (dissoc game-doc :_id) {:upsert true})))
