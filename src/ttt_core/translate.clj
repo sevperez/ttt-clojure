@@ -36,7 +36,7 @@
      :invalid-move "Wprowadziłeś nieprawidłowy ruch."
      :move-string (fn [[name]] (str "Ruch " (genitive-with-num name) "!"))
      :player-string "Gracz"
-     :tie-string "Ta gra zakończyła się remis!"
+     :tie-string "Ta gra zakończyła się remisem!"
      :title "Kółko i krzyżyk"
      :unavailable-entry "Niedostępny wpis."}})
 

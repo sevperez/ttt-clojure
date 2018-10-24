@@ -74,9 +74,7 @@
 (defn build-selection-string 
   ([language msg-keyword] (build-selection-string language msg-keyword ""))
   ([language msg-keyword prepend-msg]
-    (str prepend-msg
-      (if (= "" prepend-msg) "" " ")
-      (translate [language] [msg-keyword]))))
+    (s/trim (str prepend-msg " " (translate [language] [msg-keyword])))))
         
 (defn request-game-setup
   ([game] (request-game-setup game ""))

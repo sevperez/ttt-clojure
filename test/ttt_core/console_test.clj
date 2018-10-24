@@ -334,7 +334,7 @@
     (is (= "This game ended in a tie!"
       (build-congratulations-message nil :en))))
   (testing "it returns a tie string if winner is nil in :pl"
-    (is (= "Ta gra zakończyła się remis!"
+    (is (= "Ta gra zakończyła się remisem!"
       (build-congratulations-message nil :pl)))))
 
 (deftest handle-language-selection-test
