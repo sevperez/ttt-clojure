@@ -1,11 +1,12 @@
 ## Impossible TTT
 ### Clojure Implementation
 
-A functional programming style implementation of Impossible TTT on the command line, in Clojure.
+An implementation of Impossible TTT on the command line, in Clojure.
 
 #### Setup
 
 * If you don't have Clojure / Leiningen installed, you can download / install from here: https://leiningen.org/
+* MongoDB is required for game history persistence. If you do not have MongoDB installed locally, you can download / install from here: https://docs.mongodb.com/manual/installation/
 * Clone the Impossible TTT repository
 * Change directories into the `ttt-clojure` directory
 
@@ -16,4 +17,4 @@ A functional programming style implementation of Impossible TTT on the command l
 
 #### Testing
 
-* For unit tests, change directories into the `test` directory and run the `lein test` command.
+* For unit tests, run the `lein test` command.

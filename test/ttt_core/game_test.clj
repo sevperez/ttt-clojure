@@ -2,31 +2,41 @@
   (:require [clojure.test :refer :all]
             [ttt-core.game :refer :all]
             [persistence.db :refer [save]]
-            [persistence.db-test :refer [save-mock]]))
+            [persistence.db-test :refer [save-mock]]
+            [clj-time.local :as lt]))
+
+(def default-time "2018-10-24T12:00:00.0Z")
 
 (deftest initialize-game-test
   (testing "returns a default game map that has a board"
     (is (= {:_id "123abc"
+            :created-at default-time
+            :updated-at default-time
             :language :en
             :game-mode nil
             :current-token :player-1-token
             :player-1-token :x
             :player-2-token :o
             :board [nil nil nil nil nil nil nil  nil nil]}
-      (initialize-game "123abc")))))
+      (initialize-game "123abc" default-time)))))
 
 (deftest update-game-test
   (testing "returns an updated game map if valid move input"
     (is (= {:_id "123abc"
+            :created-at default-time
+            :updated-at default-time
             :language :en
             :game-mode :human-vs-human
             :current-token :player-2-token
             :player-1-token :x
             :player-2-token :o
             :board [nil nil nil nil :x nil nil  nil nil]}
-      (update-game (assoc (initialize-game "123abc") :game-mode :human-vs-human) 4))))
+      (update-game
+        (assoc (initialize-game "123abc" default-time) :game-mode :human-vs-human) 4))))
   (testing "returns an identical game map if move input is invalid"
     (is (= {:_id "123abc"
+            :created-at default-time
+            :updated-at default-time
             :language :en
             :game-mode :human-vs-human
             :current-token :player-2-token
@@ -35,6 +45,8 @@
             :board [:x :o nil nil :x nil nil  nil nil]}
       (update-game
         {:_id "123abc"
+         :created-at default-time
+         :updated-at default-time
          :language :en
          :game-mode :human-vs-human
          :current-token :player-2-token
@@ -47,7 +59,10 @@
   (testing "it returns an appropriate message if player 1 wins"
     (is (= "Congratulations! X won the game!"
       (get-game-end-message
-        {:language :en
+        {:_id "123abc"
+         :created-at default-time
+         :updated-at default-time
+         :language :en
          :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
@@ -56,7 +71,10 @@
   (testing "it returns an appropriate message if player 2 wins"
     (is (= "Congratulations! O won the game!"
       (get-game-end-message
-        {:language :en
+        {:_id "123abc"
+         :created-at default-time
+         :updated-at default-time
+         :language :en
          :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
@@ -65,7 +83,10 @@
   (testing "it returns a draw message if there is no winner"
     (is (= "This game ended in a tie!"
       (get-game-end-message
-        {:language :en
+        {:_id "123abc"
+         :created-at default-time
+         :updated-at default-time
+         :language :en
          :game-mode :human-vs-human
          :current-token :player-2-token
          :player-1-token :x
@@ -79,8 +100,10 @@
         (count (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play)))))))
     (testing "it returns a game history map with blank game data at the start"
       (with-out-str (is (= 
-        (dissoc (assoc (initialize-game "123abc") :game-mode :human-vs-human) :_id)
-        (dissoc (first (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play))) :_id)))))
+        (dissoc (assoc (initialize-game) :game-mode :human-vs-human)
+          :_id :updated-at :created-at)
+        (dissoc (first (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play))) 
+          :_id :updated-at :created-at)))))
     (testing "it returns a game history map with the final game data at the end"
       (with-out-str (is (= [:x :o :x :o :x :o :x nil nil]
         (:board (last (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play))))))))

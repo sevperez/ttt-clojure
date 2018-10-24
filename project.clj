@@ -7,7 +7,8 @@
                  [com.taoensso/tempura "1.2.1"]
                  [com.novemberain/monger "3.1.0"]
                  [tortue/spy "1.4.0"]
-                 [org.slf4j/slf4j-nop "1.7.12"]]
+                 [org.slf4j/slf4j-nop "1.7.12"]
+                 [clj-time "0.15.0"]]
   :main ^:skip-aot ttt-core.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

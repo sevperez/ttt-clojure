@@ -8,12 +8,16 @@
                build-congratulations-message handle-game-setup]]
             [artificial-intelligence.ai :refer [choose-move] :as ai]
             [artificial-intelligence.minimax :refer [minimax-memo] :as mm]
-            [persistence.db :refer [save generate-uuid] :as db]))
+            [persistence.db :refer [save generate-uuid] :as db]
+            [clj-time.local :as lt]
+            [clj-time.format :as f]))
 
 (defn initialize-game
-  ([] (initialize-game (generate-uuid)))
-  ([id] 
+  ([] (initialize-game (generate-uuid) (f/unparse (f/formatters :date-time) (lt/local-now))))
+  ([id timestamp] 
     {:_id id
+     :created-at timestamp
+     :updated-at timestamp
      :language :en
      :game-mode nil
      :current-token :player-1-token
