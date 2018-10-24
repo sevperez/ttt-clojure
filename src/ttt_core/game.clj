@@ -7,7 +7,8 @@
               [draw-main handle-player-move-selection keyword-to-token
                build-congratulations-message handle-game-setup]]
             [artificial-intelligence.ai :refer [choose-move] :as ai]
-            [artificial-intelligence.minimax :refer [minimax-memo] :as mm]))
+            [artificial-intelligence.minimax :refer [minimax-memo] :as mm]
+            [persistence.db :refer [save] :as db]))
 
 (defn initialize-game [] 
   {:language :en
