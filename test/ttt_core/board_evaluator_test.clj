@@ -3,15 +3,15 @@
             [ttt-core.board-evaluator :refer :all]))
 
 (deftest terminal-score-test
-  (testing "returns the provided max-score if test-token is the winner")
+  (testing "returns the provided max-score if test-token is the winner"
     (is (= 1000
-      (terminal-score [:x :x :x :o :o nil nil nil nil] :x :o -1000 1000)))
-  (testing "returns the provided min-score if other-token is the winner")
+      (terminal-score [:x :x :x :o :o nil nil nil nil] :x :o -1000 1000))))
+  (testing "returns the provided min-score if other-token is the winner"
     (is (= -1000
-      (terminal-score [:x :x nil :o :o :o nil nil nil] :x :o -1000 1000)))
-  (testing "returns zero if neither test-token nor other-token is the winner")
+      (terminal-score [:x :x nil :o :o :o nil nil nil] :x :o -1000 1000))))
+  (testing "returns zero if neither test-token nor other-token is the winner"
     (is (= 0
-      (terminal-score [:x :x nil :o :o :nil nil nil nil] :x :o -1000 1000))))
+      (terminal-score [:x :x nil :o :o :nil nil nil nil] :x :o -1000 1000)))))
 
 (deftest heuristic-score-test
   (testing "returns a heuristic score based on a superior test-token board"
