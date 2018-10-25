@@ -4,44 +4,29 @@
             [clj-time.local :as lt]
             [persistence.db :refer :all]))
 
-(def save-mock
-  (spy/mock (fn [game-history game-id]
-    (let [db        {}
-          game-doc  (build-game-doc game-history)]
-      (assoc db game-id game-doc)))))
-
 (def default-time "2018-10-24T12:00:00.0Z")
 
+(def save-mock
+  (spy/mock (fn [game-history game-id]
+    (assoc {} game-id (dissoc game-history :_id)))))
+
 (deftest save-test
-  (testing "it saves a game game doc to the db"
-    (let [test-history  [{:_id "123abc"
-                          :created-at default-time
-                          :updated-at "2018-10-24T12:00:00.0Z"
-                          :board [nil nil nil nil nil nil nil nil nil]
-                          :current-token :player-1-token
-                          :game-mode :human-vs-human
-                          :language :en
-                          :player-1-token :x
-                          :player-2-token :o}
-                         {:_id "123abc"
-                          :created-at default-time
-                          :updated-at "2018-10-24T12:00:11.0Z"
-                          :board [:x nil nil nil nil nil nil nil nil]
-                          :current-token :player-2-token
-                          :game-mode :human-vs-human
-                          :language :en
-                          :player-1-token :x
-                          :player-2-token :o}
-                         {:_id "123abc"
-                          :created-at default-time
-                          :updated-at "2018-10-24T12:00:20.0Z"
-                          :board [:x :o nil nil nil nil nil nil nil]
-                          :current-token :player-1-token
-                          :game-mode :human-vs-human
-                          :language :en
-                          :player-1-token :x
-                          :player-2-token :o}]
-          expected-db   { "123abc" 
+  (testing "it saves a game doc to the db"
+    (let [test-history  {:_id "123abc" 
+                         :created-at default-time
+                         :updated-at "2018-10-24T12:00:20.0Z"
+                         :language :en
+                         :game-mode :human-vs-human
+                         :player-1-token :x
+                         :player-2-token :o
+                         :history
+                          [{:board [nil nil nil nil nil nil nil nil nil]
+                            :current-token :player-1-token}
+                           {:board [:x nil nil nil nil nil nil nil nil]
+                            :current-token :player-2-token}
+                           {:board [:x :o nil nil nil nil nil nil nil]
+                            :current-token :player-1-token}]}
+          expected-db   {"123abc" 
                           {:created-at default-time
                            :updated-at "2018-10-24T12:00:20.0Z"
                            :language :en
@@ -56,54 +41,64 @@
                              {:board [:x :o nil nil nil nil nil nil nil]
                               :current-token :player-1-token}]}}]
       (with-redefs [save save-mock]
-        (save test-history (:_id (last test-history)))
+        (save test-history (:_id test-history))
         (is (= expected-db (spy/first-response save)))))))
+
+(def retrieve-last-mock
+  (spy/mock (fn []
+    (let [db        {}]
+      {}))))
+
+(deftest retrieve-last-test
+  (testing "it retrieves the most recent game from the db"
+    (let [db  ({:_id "123abc"
+                :created-at "2018-10-25T16:50:49.267Z"
+                :game-mode "human-vs-computer"
+                :history [{:board [nil nil nil nil nil nil nil nil nil]
+                           :current-token "player-1-token"}
+                          {:board ["x" nil nil nil nil nil nil nil nil]
+                           :current-token "player-2-token"}
+                          {:board ["x" nil nil nil "o" nil nil nil nil]
+                           :current-token "player-1-token"}
+                          {:board ["x" "x" nil nil "o" nil nil nil nil]
+                           :current-token "player-2-token"}
+                          {:board ["x" "x" "o" nil "o" nil nil nil nil]
+                           :current-token "player-1-token"}
+                          {:board ["x" "x" "o" "x" "o" nil nil nil nil]
+                           :current-token "player-2-token"}
+                          {:board ["x" "x" "o" "x" "o" nil "o" nil nil]
+                           :current-token "player-1-token"}]
+                :language "en"
+                :player-1-token "x"
+                :player-2-token "o"
+                :updated-at "2018-10-25T16:50:54.588Z"}
+              {:_id "456def"
+                :created-at "2018-10-25T18:17:36.466Z"
+                :game-mode "human-vs-human"
+                :history [{:board [nil nil nil nil nil nil nil nil nil]
+                           :current-token "player-1-token"}
+                          {:board [nil nil nil "x" nil nil nil nil nil]
+                           :current-token "player-2-token"}
+                          {:board ["o" nil nil "x" nil nil nil nil nil]
+                           :current-token "player-1-token"}
+                          {:board ["o" nil nil "x" nil nil nil nil "x"]
+                           :current-token "player-2-token"}
+                          {:board ["o" "o" nil "x" nil nil nil nil "x"]
+                           :current-token "player-1-token"}
+                          {:board ["o" "o" "x" "x" nil nil nil nil "x"]
+                           :current-token "player-2-token"}
+                          {:board ["o" "o" "x" "x" nil nil nil "o" "x"]
+                           :current-token "player-1-token"}
+                          {:board ["o" "o" "x" "x" nil "x" nil "o" "x"]
+                           :current-token "player-2-token"}]
+                :language "pl"
+                :player-1-token "x"
+                :player-2-token "o"
+                :updated-at "2018-10-25T18:18:02.007Z"})]
+      (with-redefs [retrieve-last retrieve-last-mock]
+        (retrieve-last)
+        (is (= nil (spy/first-response retrieve-last)))))))
 
 (deftest generate-uuid-test
   (testing "it returns a uuid as an object of type org.bson.types.ObjectId"
     (is (= org.bson.types.ObjectId (type (generate-uuid))))))
-
-(deftest build-game-doc-test
-  (testing "it builds a normalized game-doc"
-    (is (=
-      {:created-at default-time
-       :updated-at "2018-10-24T12:00:20.0Z"
-       :language :en
-       :game-mode :human-vs-human
-       :player-1-token :x
-       :player-2-token :o
-       :history
-        [{:board [nil nil nil nil nil nil nil nil nil]
-          :current-token :player-1-token}
-         {:board [:x nil nil nil nil nil nil nil nil]
-          :current-token :player-2-token}
-         {:board [:x :o nil nil nil nil nil nil nil]
-          :current-token :player-1-token}]}
-      (build-game-doc 
-        [{:_id "123abc"
-          :created-at default-time
-          :updated-at "2018-10-24T12:00:00.0Z"
-          :board [nil nil nil nil nil nil nil nil nil]
-          :current-token :player-1-token
-          :game-mode :human-vs-human
-          :language :en
-          :player-1-token :x
-          :player-2-token :o}
-         {:_id "123abc"
-          :created-at default-time
-          :updated-at "2018-10-24T12:00:11.0Z"
-          :board [:x nil nil nil nil nil nil nil nil]
-          :current-token :player-2-token
-          :game-mode :human-vs-human
-          :language :en
-          :player-1-token :x
-          :player-2-token :o}
-         {:_id "123abc"
-          :created-at default-time
-          :updated-at "2018-10-24T12:00:20.0Z"
-          :board [:x :o nil nil nil nil nil nil nil]
-          :current-token :player-1-token
-          :game-mode :human-vs-human
-          :language :en
-          :player-1-token :x
-          :player-2-token :o}])))))

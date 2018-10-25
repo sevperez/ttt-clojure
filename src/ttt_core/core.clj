@@ -1,7 +1,7 @@
 (ns ttt-core.core
   (:require [ttt-core.game :refer [play]]
-            [clj-time.local :as lt]
-            [clj-time.format :as f]))
+            [monger.core :as mg]            ;; temp
+            [monger.collection :as mc]))    ;; temp
 
 (defn -main [& args]
   (play))

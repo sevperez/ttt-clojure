@@ -25,6 +25,14 @@
      :player-2-token :o
      :board [nil nil nil nil nil nil nil  nil nil]}))
 
+(defn update-history
+  ([game]
+    (update-history game {}))
+  ([game history]
+    (let [history (if (empty? history) (dissoc game :board :current-token) history)
+          turn (select-keys game [:board :current-token])]
+      (assoc history :moves (vec (conj (:moves history) turn))))))
+
 (defn- update-current-player [game]
   (assoc game :current-token
     (if (= (:current-token game) :player-1-token) :player-2-token :player-1-token)))
@@ -58,12 +66,12 @@
 
 (defn play []
   (loop [game     (handle-game-setup (initialize-game))
-         history  [game]]
+         history  (update-history game)]
     (do
-      (save history (or (:_id (last history)) (generate-uuid)))
+      (save history (or (:_id history) (generate-uuid)))
       (if (is-game-over? (:board game))
         (do 
           (draw-main game (get-game-end-message game))
           history)
         (let [new-game (update-game game (get-next-move game))]
-          (recur new-game (conj history new-game)))))))
+          (recur new-game (update-history new-game history)))))))

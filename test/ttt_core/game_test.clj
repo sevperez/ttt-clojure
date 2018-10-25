@@ -95,22 +95,65 @@
 
 (deftest play-test
   (with-redefs [save save-mock]
-    (testing "it returns a game history map of length equal to number moves + 1"
+    (testing "it returns a game history with moves vector of length equal to number moves + 1"
       (with-out-str (is (= 8
-        (count (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play)))))))
-    (testing "it returns a game history map with blank game data at the start"
-      (with-out-str (is (= 
-        (dissoc (assoc (initialize-game) :game-mode :human-vs-human)
-          :_id :updated-at :created-at)
-        (dissoc (first (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play))) 
-          :_id :updated-at :created-at)))))
-    (testing "it returns a game history map with the final game data at the end"
+        (count (:moves (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play))))))))
+    (testing "it returns a game history map with the first move record containing a blank board"
+      (with-out-str (is (= [nil nil nil nil nil nil nil nil nil]
+        (:board (first (:moves (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play)))))))))
+    (testing "it returns a game history map with the last move record containing a completed game"
       (with-out-str (is (= [:x :o :x :o :x :o :x nil nil]
-        (:board (last (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play))))))))
-    (testing "it returns a game history map where the last item is a draw"
+        (:board (last (:moves (with-in-str "1\n1\n2\n3\n4\n5\n6\n7\n" (play)))))))))
+    (testing "it returns a game history map where the last move record is a draw"
       (with-out-str (is (= [:x :x :o :o :o :x :x :o :x]
-        (:board (last (with-in-str "1\n1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play))))))))
-    (testing "it returns a game history map where the last item is a draw and game is in Polish"
+        (:board (last (:moves (with-in-str "1\n1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play)))))))))
+    (testing "it returns a game history map where the last move record is a draw and game is in Polish"
       (with-out-str (is (= [:x :x :o :o :o :x :x :o :x]
-        (:board (last (with-in-str "3\n2\n1\n1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play))))))))))
+        (:board (last (:moves (with-in-str "3\n2\n1\n1\n3\n2\n4\n6\n5\n7\n8\n9\n" (play)))))))))))
 
+(deftest update-history-test
+  (testing "it creates an initial history map using a newly-initialized game"
+    (is (=
+      {:_id "123abc"
+       :language :en
+       :game-mode :human-vs-human
+       :created-at default-time
+       :updated-at default-time
+       :player-1-token :x
+       :player-2-token :o
+       :moves [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}
+      (update-history 
+        (assoc (initialize-game "123abc" default-time) :game-mode :human-vs-human)))))
+  (testing "it updates an existing history map with a new turn"
+    (is (=
+      {:_id "123abc"
+       :language :en
+       :game-mode :human-vs-human
+       :created-at default-time
+       :updated-at default-time
+       :player-1-token :x
+       :player-2-token :o
+       :moves [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil nil nil]
+                  :current-token :player-2-token}]}
+      (update-history 
+        {:_id "123abc"
+         :language :en
+         :game-mode :human-vs-human
+         :created-at default-time
+         :updated-at default-time
+         :current-token :player-2-token
+         :player-1-token :x
+         :player-2-token :o
+         :board [:x nil nil nil nil nil nil nil nil]}
+        {:_id "123abc"
+         :language :en
+         :game-mode :human-vs-human
+         :created-at default-time
+         :updated-at default-time
+         :player-1-token :x
+         :player-2-token :o
+         :moves [{:board [nil nil nil nil nil nil nil nil nil]
+                    :current-token :player-1-token}]})))))
