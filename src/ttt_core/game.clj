@@ -60,7 +60,7 @@
   (loop [game     (handle-game-setup (initialize-game))
          history  [game]]
     (do
-      (save history)
+      (save history (or (:_id (last history)) (generate-uuid)))
       (if (is-game-over? (:board game))
         (do 
           (draw-main game (get-game-end-message game))

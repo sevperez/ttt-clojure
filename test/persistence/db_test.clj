@@ -5,11 +5,10 @@
             [persistence.db :refer :all]))
 
 (def save-mock
-  (spy/mock (fn [game-history]
+  (spy/mock (fn [game-history game-id]
     (let [db        {}
-          game-doc  (build-game-doc game-history)
-          id        (:_id game-doc)]
-      (assoc db id (dissoc game-doc :_id))))))
+          game-doc  (build-game-doc game-history)]
+      (assoc db game-id game-doc)))))
 
 (def default-time "2018-10-24T12:00:00.0Z")
 
@@ -57,8 +56,7 @@
                              {:board [:x :o nil nil nil nil nil nil nil]
                               :current-token :player-1-token}]}}]
       (with-redefs [save save-mock]
-        (save test-history)
-        (is (spy/called-with? save test-history))
+        (save test-history (:_id (last test-history)))
         (is (= expected-db (spy/first-response save)))))))
 
 (deftest generate-uuid-test
@@ -68,8 +66,7 @@
 (deftest build-game-doc-test
   (testing "it builds a normalized game-doc"
     (is (=
-      {:_id "123abc"
-       :created-at default-time
+      {:created-at default-time
        :updated-at "2018-10-24T12:00:20.0Z"
        :language :en
        :game-mode :human-vs-human
@@ -110,14 +107,3 @@
           :language :en
           :player-1-token :x
           :player-2-token :o}])))))
-  (testing "it inserts a uuid of type org.bson.types.ObjectId if no id in game doc"
-    (is (= org.bson.types.ObjectId
-      (type (:_id
-        (build-game-doc 
-          [{:_id nil
-            :board [nil nil nil nil nil nil nil nil nil]
-            :current-token :player-1-token
-            :game-mode :human-vs-human
-            :language :en
-            :player-1-token :x
-            :player-2-token :o}]))))))
