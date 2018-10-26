@@ -1,7 +1,8 @@
 (ns ttt-core.console 
   (:require [clojure.string :as s]
             [ttt-core.rules :refer [is-move-valid?]]
-            [ttt-core.translate :refer [translate]]))
+            [ttt-core.translate :refer [translate]]
+            [persistence.db :refer [retrieve-last history-to-game]]))
 
 (def board-shape 
   (str "          |     |     \n"
@@ -79,7 +80,7 @@
 (defn request-game-setup
   ([game] (request-game-setup game ""))
   ([game prepend-msg]
-    (let [opts {:1 :human-vs-human :2 :human-vs-computer :3 :language-setup}]
+    (let [opts {:1 :human-vs-human :2 :human-vs-computer :3 :language-setup :4 :load-last-game}]
       (do
         (draw-main game (translate [(:language game)] [:game-setup-selection-header]))
         (println (build-selection-string (:language game) :choose-game-setup prepend-msg))
@@ -103,13 +104,24 @@
 (defn handle-language-selection [game]
   (assoc game :language (get-selection game request-language-setup)))
 
+(defn handle-load-game-selection []
+  (let [last-game (retrieve-last)]
+    (if last-game (history-to-game last-game) nil)))
+
 (defn handle-game-setup [game]
   (loop [game      game
          selection (get-selection game request-game-setup)]
-    (if (= :language-setup selection)
-      (let [updated-game (handle-language-selection game)]
-        (recur updated-game (get-selection updated-game request-game-setup)))
-      (assoc game :game-mode selection))))
+    (cond
+      (= :language-setup selection)
+        (let [updated-game (handle-language-selection game)]
+          (recur updated-game (get-selection updated-game request-game-setup)))
+      (= :load-last-game selection)
+        (let [updated-game (handle-load-game-selection)]
+          (if updated-game
+            updated-game
+            (recur game (get-selection game request-game-setup))))
+      :else
+        (assoc game :game-mode selection))))
 
 (defn current-player-name [current-player-token game-mode language]
   (let [player-string   (translate [language] [:player-string])

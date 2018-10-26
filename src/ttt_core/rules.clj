@@ -29,6 +29,4 @@
 (defn- is-game-won? [board] (not= nil (get-winning-token board)))
 
 (defn is-game-over? [board]
-  (if (or (is-full? board) (is-game-won? board))
-    true
-    false))
+  (or (is-full? board) (is-game-won? board)))

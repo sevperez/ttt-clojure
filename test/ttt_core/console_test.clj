@@ -1,6 +1,8 @@
 (ns ttt-core.console-test
   (:require [clojure.test :refer :all]
-            [ttt-core.console :refer :all]))
+            [ttt-core.console :refer :all]
+            [persistence.db :refer [retrieve-last]]
+            [persistence.db-test :refer [retrieve-last-mock]]))
 
 (deftest draw-board-test
   (testing "it draws an empty board to the console"
@@ -90,7 +92,7 @@
          :board [nil nil nil nil nil nil nil nil nil]}
         request-game-setup))))))
   (testing "it continues requesting input for request-game-setup until it's valid"
-    (with-out-str (is (= :human-vs-human (with-in-str "4\na\nX\n1"
+    (with-out-str (is (= :human-vs-human (with-in-str "8\na\nX\n1"
       (get-selection
         {:language :en
          :game-mode nil
@@ -132,16 +134,16 @@
 
 (deftest build-selection-string-test
   (testing "it returns a default choose game setup message"
-    (is (= "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)"
+    (is (= "Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)\n4. (Load last game)"
       (build-selection-string :en :choose-game-setup))))
   (testing "it returns a choose game setup message in :pl if language is set to :pl"
-    (is (= "Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)"
+    (is (= "Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)\n4. (Załaduj ostatnią grę)"
       (build-selection-string :pl :choose-game-setup))))
   (testing "it optionally returns a choose game setup message with a prepended argument string in :en"
-    (is (= "Invalid selection. Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)"
+    (is (= "Invalid selection. Choose a game mode:\n1. Human-vs-Human\n2. Human-vs-Computer\n3. (Change game language)\n4. (Load last game)"
       (build-selection-string :en :choose-game-setup "Invalid selection."))))
   (testing "it optionally returns a choose game setup message with a prepended argument in :pl"
-    (is (= "Nieprawidłowy wybór. Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)"
+    (is (= "Nieprawidłowy wybór. Wybierz tryb gry:\n1. Człowiek kontra człowiek\n2. Człowiek kontra komputer\n3. (Zmień język gry)\n4. (Załaduj ostatnią grę)"
       (build-selection-string :pl :choose-game-setup "Nieprawidłowy wybór."))))
   (testing "it returns a default choose language message"
     (is (= "Choose a language:\n1. English\n2. Polish"
@@ -370,3 +372,8 @@
              :player-1-token :x
              :player-2-token :o
              :board [nil nil nil nil nil nil nil nil nil]})))))))
+
+; (deftest handle-load-game-selection-test
+;   (with-redefs [retrieve-last retrieve-last-mock]
+;     (testing "it returns nil if db is empty"
+;       (is (= true false)))))

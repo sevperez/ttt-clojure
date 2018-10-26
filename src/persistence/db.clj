@@ -11,24 +11,37 @@
 
 (defn- get-local-time-string [] (f/unparse (f/formatters :date-time) (lt/local-now)))
 
-; (defn build-game-doc [history]
-;   (let [last-item (last history)]
-;     {:created-at (:created-at last-item)
-;      :updated-at (:updated-at last-item)
-;      :language (:language last-item)
-;      :game-mode (:game-mode last-item)
-;      :player-1-token (:player-1-token last-item)
-;      :player-2-token (:player-2-token last-item)
-;      :history (vec (map board-and-token history))}))
-
 (defn save [game-history game-id]
   (let [conn              (mg/connect)
         db                (mg/get-db conn "ttt-clojure")
-        ; game-doc          (build-game-doc game-history)
         update-timestamp  (get-local-time-string)]
     (mc/update db "games" 
       {:_id game-id} 
       (assoc game-history :updated-at update-timestamp)
       {:upsert true})))
 
-(defn retrieve-last [] {})
+(defn retrieve-last []
+  (let [conn              (mg/connect)
+        db                (mg/get-db conn "ttt-clojure")]
+    (last (mc/find-maps db "games"))))
+
+(defn adjust-turn-map-keywords [turn-map]
+  {:board (vec (map keyword (:board turn-map)))
+   :current-token (keyword (:current-token turn-map))})
+
+(defn adjust-history-map-keywords [history-map]
+  (assoc history-map
+    :game-mode (keyword (:game-mode history-map))
+    :language (keyword (:language history-map))
+    :player-1-token (keyword (:player-1-token history-map))
+    :player-2-token (keyword (:player-2-token history-map))
+    :moves (vec (map adjust-turn-map-keywords (:moves history-map)))))
+
+(defn history-to-game [history-map]
+  (if history-map
+    (let [adjusted-history (adjust-history-map-keywords history-map)
+          last-turn        (last (:moves adjusted-history))]
+      (assoc (dissoc adjusted-history :moves)
+        :board (:board last-turn)
+        :current-token (:current-token last-turn)))
+    nil))
