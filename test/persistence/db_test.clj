@@ -59,7 +59,7 @@
         '({:_id "123abc"
            :created-at "2018-10-25T16:50:49.267Z"
            :game-mode "human-vs-computer"
-           :moves [{:board [nil nil nil nil nil nil nil nil nil]
+           :turns [{:board [nil nil nil nil nil nil nil nil nil]
                     :current-token "player-1-token"}
                    {:board ["x" nil nil nil nil nil nil nil nil]
                     :current-token "player-2-token"}
@@ -80,7 +80,7 @@
           {:_id "456def"
            :created-at "2018-10-25T18:17:36.466Z"
            :game-mode "human-vs-human"
-           :moves [{:board [nil nil nil nil nil nil nil nil nil]
+           :turns [{:board [nil nil nil nil nil nil nil nil nil]
                     :current-token "player-1-token"}
                    {:board [nil nil nil "x" nil nil nil nil nil]
                     :current-token "player-2-token"}
@@ -103,7 +103,7 @@
       (is (= {:_id "456def"
               :created-at "2018-10-25T18:17:36.466Z"
               :game-mode "human-vs-human"
-              :moves [{:board [nil nil nil nil nil nil nil nil nil]
+              :turns [{:board [nil nil nil nil nil nil nil nil nil]
                        :current-token "player-1-token"}
                       {:board [nil nil nil "x" nil nil nil nil nil]
                        :current-token "player-2-token"}
@@ -134,7 +134,7 @@
     (is (= {:_id "456def"
               :created-at "2018-10-25T18:17:36.466Z"
               :game-mode :human-vs-human
-              :moves [{:board [:x :o nil nil nil nil nil nil nil]
+              :turns [{:board [:x :o nil nil nil nil nil nil nil]
                        :current-token :player-1-token}]
               :language :pl
               :player-1-token :x
@@ -144,7 +144,7 @@
           {:_id "456def"
            :created-at "2018-10-25T18:17:36.466Z"
            :game-mode "human-vs-human"
-           :moves [{:board ["x" "o" nil nil nil nil nil nil nil]
+           :turns [{:board ["x" "o" nil nil nil nil nil nil nil]
                     :current-token "player-1-token"}]
            :language "pl"
            :player-1-token "x"
@@ -168,7 +168,7 @@
         {:_id "456def"
          :created-at "2018-10-25T18:17:36.466Z"
          :game-mode "human-vs-human"
-         :moves [{:board [ "x" "o" nil nil nil nil nil nil]
+         :turns [{:board [ "x" "o" nil nil nil nil nil nil]
                   :current-token "player-1-token"}]
          :language "pl"
          :player-1-token "x"

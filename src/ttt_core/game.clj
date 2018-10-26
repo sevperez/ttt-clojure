@@ -20,38 +20,32 @@
      :updated-at timestamp
      :language :en
      :game-mode nil
-     :current-token :player-1-token
      :player-1-token :x
      :player-2-token :o
-     :board [nil nil nil nil nil nil nil  nil nil]}))
-
-(defn update-history
-  ([game]
-    (update-history game {}))
-  ([game history]
-    (let [history (if (empty? history) (dissoc game :board :current-token) history)
-          turn (select-keys game [:board :current-token])]
-      (assoc history :moves (vec (conj (:moves history) turn))))))
+     :turns [{:board [nil nil nil nil nil nil nil  nil nil]
+              :current-token :player-1-token}]}))
 
 (defn- update-current-player [game]
-  (assoc game :current-token
-    (if (= (:current-token game) :player-1-token) :player-2-token :player-1-token)))
+  (if (= (:current-token (last (:turns game))) :player-1-token) :player-2-token :player-1-token))
 
-(defn- get-current-token [game] ((:current-token game) game))
+(defn- get-current-token [game] ((:current-token (last (:turns game))) game))
 
-(defn- update-board [game location]
-  (assoc game :board (fill-location (:board game) (get-current-token game) location)))
+(defn- update-board [board token location] (fill-location board token location))
 
-(defn- update-board-and-player [game location]
-  ((comp update-current-player update-board) game location))
+(defn- add-turn [game location]
+  (let [last-turn (last (:turns game))
+        new-board (update-board (:board last-turn) (get-current-token game) location)
+        new-token (update-current-player game)
+        new-turns (conj (:turns game) {:board new-board :current-token new-token})]
+    (assoc game :turns new-turns)))
 
 (defn update-game [game location]
-  (if (is-move-valid? (:board game) location)
-    (update-board-and-player game location)
+  (if (is-move-valid? (:board (last (:turns game))) location)
+    (add-turn game location)
     game))
 
 (defn get-game-end-message [game]
-  (let [winner (get-winning-token (:board game))]
+  (let [winner (get-winning-token (:board (last (:turns game))))]
     (build-congratulations-message winner (:language game))))
 
 (defn- ai-move [game]
@@ -65,13 +59,11 @@
       (ai-move game))))
 
 (defn play []
-  (loop [game     (handle-game-setup (initialize-game))
-         history  (update-history game)]
+  (loop [game (handle-game-setup (initialize-game))]
     (do
-      (save history (or (:_id history) (generate-uuid)))
+      (save game (or (:_id game) (generate-uuid)))
       (if (is-game-over? (:board game))
         (do 
           (draw-main game (get-game-end-message game))
-          history)
-        (let [new-game (update-game game (get-next-move game))]
-          (recur new-game (update-history new-game history)))))))
+          game)
+        (recur (update-game game (get-next-move game)))))))

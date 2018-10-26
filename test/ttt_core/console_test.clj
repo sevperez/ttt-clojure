@@ -372,8 +372,3 @@
              :player-1-token :x
              :player-2-token :o
              :board [nil nil nil nil nil nil nil nil nil]})))))))
-
-; (deftest handle-load-game-selection-test
-;   (with-redefs [retrieve-last retrieve-last-mock]
-;     (testing "it returns nil if db is empty"
-;       (is (= true false)))))

@@ -32,7 +32,7 @@
     
 (deftest is-game-over?-test 
   (testing "returns false if the game is not over"
-    (is (= false (is-game-over? (:board (initialize-game))))))
+    (is (= false (is-game-over? [nil nil nil nil nil nil nil nil nil]))))
   (testing "returns true if the game board is full"
     (is (= true (is-game-over? [:x :x :o :o :o :x :x :o :x]))))
   (testing "returns true if the game board has a winner"
