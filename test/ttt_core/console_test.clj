@@ -41,34 +41,34 @@
     (with-out-str (is 
       (= {:language :en
           :game-mode :human-vs-human
-          :current-token :player-1-token
           :player-1-token :x
           :player-2-token :o
-          :board [nil nil nil nil nil nil nil nil nil]}
+          :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                   :current-token :player-1-token}]}
         (with-in-str "1"
           (handle-game-setup
             {:language :en
              :game-mode nil
-             :current-token :player-1-token
              :player-1-token :x
              :player-2-token :o
-             :board [nil nil nil nil nil nil nil nil nil]}))))))
+             :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                      :current-token :player-1-token}]}))))))
   (testing "it returns a game with :game-mode set to :human-vs-computer with valid input"
     (with-out-str (is 
       (= {:language :en
           :game-mode :human-vs-computer
-          :current-token :player-1-token
           :player-1-token :x
           :player-2-token :o
-          :board [nil nil nil nil nil nil nil nil nil]}
+          :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                   :current-token :player-1-token}]}
         (with-in-str "2"
           (handle-game-setup
             {:language :en
              :game-mode nil
-             :current-token :player-1-token
              :player-1-token :x
              :player-2-token :o
-             :board [nil nil nil nil nil nil nil nil nil]})))))))
+             :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                      :current-token :player-1-token}]})))))))
 
 (deftest get-selection-test
   (testing "it returns :human-vs-human for request-game-setup if selected"
@@ -76,60 +76,60 @@
       (get-selection
         {:language :en
          :game-mode nil
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [nil nil nil nil nil nil nil nil nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}
         request-game-setup))))))
   (testing "it returns :human-vs-computer for request-game-setup if selected"
     (with-out-str (is (= :human-vs-computer (with-in-str "2" 
       (get-selection
         {:language :en
          :game-mode nil
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [nil nil nil nil nil nil nil nil nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}
         request-game-setup))))))
   (testing "it continues requesting input for request-game-setup until it's valid"
     (with-out-str (is (= :human-vs-human (with-in-str "8\na\nX\n1"
       (get-selection
         {:language :en
          :game-mode nil
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [nil nil nil nil nil nil nil nil nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}
         request-game-setup))))))
   (testing "it returns :en for request-language-setup if player selects English"
     (with-out-str (is (= :en (with-in-str "1" 
       (get-selection
         {:language :en
          :game-mode nil
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [nil nil nil nil nil nil nil nil nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}
         request-language-setup))))))
   (testing "it returns :pl for request-language-setup if player selects Polish"
     (with-out-str (is (= :pl (with-in-str "2" 
       (get-selection
         {:language :en
          :game-mode nil
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [nil nil nil nil nil nil nil nil nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}
         request-language-setup))))))
   (testing "it continues requesting input for request-language-setup until it's valid"
     (with-out-str (is (= :en (with-in-str "4\na\nX\n1"
       (get-selection
         {:language :en
          :game-mode nil
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [nil nil nil nil nil nil nil nil nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}
         request-language-setup)))))))
 
 (deftest build-selection-string-test
@@ -165,20 +165,24 @@
         (handle-player-move-selection
           {:language :en
            :game-mode :human-vs-human
-           :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
-           :board [:x nil nil nil nil nil nil nil nil]}))))))
+           :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                    :current-token :player-1-token}
+                   {:board [:x nil nil nil nil nil nil nil nil]
+                    :current-token :player-2-token}]}))))))
   (testing "it continues requesting input until it's valid"
     (with-out-str (is 
       (= 4 (with-in-str "20\n5"
         (handle-player-move-selection
           {:language :en
            :game-mode :human-vs-human
-           :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
-           :board [:x nil nil nil nil nil nil nil nil]})))))))
+           :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                    :current-token :player-1-token}
+                   {:board [:x nil nil nil nil nil nil nil nil]
+                    :current-token :player-2-token}]})))))))
 
 (deftest get-player-move-selection-test
   (testing "it returns an an integer if input is valid"
@@ -187,30 +191,36 @@
         (get-player-move-selection
           {:language :en
            :game-mode :human-vs-human
-           :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
-           :board [:x nil nil nil nil nil nil nil nil]})))))
+           :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                    :current-token :player-1-token}
+                   {:board [:x nil nil nil nil nil nil nil nil]
+                    :current-token :player-2-token}]})))))
   (testing "it throws a NumberFormatException if input is not integer"
     (is (thrown? NumberFormatException 
       (with-in-str "a" 
         (get-player-move-selection
           {:language :en
            :game-mode :human-vs-human
-           :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
-           :board [:x nil nil nil nil nil nil nil nil]})))))
+           :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                    :current-token :player-1-token}
+                   {:board [:x nil nil nil nil nil nil nil nil]
+                    :current-token :player-2-token}]})))))
   (testing "it throws a custom exception if input is integer but invalid move"
     (is (thrown? clojure.lang.ExceptionInfo
       (with-in-str "1"
         (get-player-move-selection
           {:language :en
            :game-mode :human-vs-human
-           :current-token :player-2-token
            :player-1-token :x
            :player-2-token :o
-           :board [:x nil nil nil nil nil nil nil nil]}))))))
+           :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                    :current-token :player-1-token}
+                   {:board [:x nil nil nil nil nil nil nil nil]
+                    :current-token :player-2-token}]}))))))
 
 (deftest draw-player-info-test 
   (testing "it returns a string with the human-vs-human player names and tokens in :en"
@@ -218,46 +228,96 @@
       (with-out-str (draw-player-info
         {:language :en
          :game-mode :human-vs-human
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]})))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil :x :o nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x :o nil :x nil nil]
+                  :current-token :player-2-token}]})))))
   (testing "it returns a string with the human-vs-human player names and tokens in :pl"
     (is (= "Gracz 1 (X)     Gracz 2 (O)\n\n" 
       (with-out-str (draw-player-info
         {:language :pl
          :game-mode :human-vs-human
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]})))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil :x :o nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x :o nil :x nil nil]
+                  :current-token :player-2-token}]})))))
   (testing "it returns a string with the human-vs-computer player names and tokens in :en"
     (is (= "Player (X)     Computer (O)\n\n" 
       (with-out-str (draw-player-info
         {:language :en
          :game-mode :human-vs-computer
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]})))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil :x :o nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x :o nil :x nil nil]
+                  :current-token :player-2-token}]})))))
   (testing "it returns a string with the human-vs-computer player names and tokens in :pl"
     (is (= "Gracz (X)     Komputer (O)\n\n" 
       (with-out-str (draw-player-info
         {:language :pl
          :game-mode :human-vs-computer
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]})))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil :x :o nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x :o nil :x nil nil]
+                  :current-token :player-2-token}]})))))
   (testing "it returns a default string if game mode has not yet been set"
     (is (= "******* (X)     ******* (O)\n\n" 
       (with-out-str (draw-player-info
         {:language :en
          :game-mode nil
-         :current-token :player-1-token
          :player-1-token :x
          :player-2-token :o
-         :board [:x :o nil :x :o nil :x nil nil]}))))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil :x :o nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x :o nil :x nil nil]
+                  :current-token :player-2-token}]}))))))
 
 (deftest current-player-name-test
   (testing "it returns the correct current player name in a human-vs-human game in :en"
@@ -287,37 +347,57 @@
       (build-choose-move-string
         {:language :en
          :game-mode :human-vs-human
-         :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
-         :board [nil nil nil nil nil nil nil nil nil]}))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}))))
   (testing "it returns a string listing all 9 spaces available on empty board in :pl"
     (is (= "Wybierz ruch: (1, 2, 3, 4, 5, 6, 7, 8, 9)"
       (build-choose-move-string
         {:language :pl
          :game-mode :human-vs-human
-         :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
-         :board [nil nil nil nil nil nil nil nil nil]}))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}]}))))
   (testing "it returns a string listing only available spaces in :en"
     (is (= "Choose a move: (3, 6, 8, 9)"
       (build-choose-move-string
         {:language :en
          :game-mode :human-vs-human
-         :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
-         :board [:x :o nil :x :x nil :o nil nil]}))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil :x nil nil :o nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x :x nil :o nil nil]
+                  :current-token :player-2-token}]}))))
   (testing "it returns a string listing only available spaces in :pl"
     (is (= "Wybierz ruch: (3, 6, 8, 9)"
       (build-choose-move-string
         {:language :pl
          :game-mode :human-vs-human
-         :current-token :player-2-token
          :player-1-token :x
          :player-2-token :o
-         :board [:x :o nil :x :x nil :o nil nil]})))))
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x nil nil nil nil nil]
+                  :current-token :player-2-token}
+                 {:board [:x :o nil :x nil nil :o nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :o nil :x :x nil :o nil nil]
+                  :current-token :player-2-token}]})))))
 
 (deftest build-congratulations-message-test 
   (testing "it returns a string to congratulate the player with the :x token in :en"

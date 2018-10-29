@@ -36,12 +36,3 @@
     :player-1-token (keyword (:player-1-token history-map))
     :player-2-token (keyword (:player-2-token history-map))
     :turns (vec (map adjust-turn-map-keywords (:turns history-map)))))
-
-(defn history-to-game [history-map]
-  (if history-map
-    (let [adjusted-history (adjust-history-map-keywords history-map)
-          last-turn        (last (:turns adjusted-history))]
-      (assoc (dissoc adjusted-history :turns)
-        :board (:board last-turn)
-        :current-token (:current-token last-turn)))
-    nil))

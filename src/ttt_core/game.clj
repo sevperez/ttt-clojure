@@ -53,7 +53,7 @@
 
 (defn get-next-move [game]
   (let [mode          (:game-mode game)
-        current-token (:current-token game)]
+        current-token (:current-token (last (:turns game)))]
     (if (or (= :player-1-token current-token) (= :human-vs-human (:game-mode game)))
       (handle-player-move-selection game)
       (ai-move game))))
@@ -62,7 +62,7 @@
   (loop [game (handle-game-setup (initialize-game))]
     (do
       (save game (or (:_id game) (generate-uuid)))
-      (if (is-game-over? (:board game))
+      (if (is-game-over? (:board (last (:turns game))))
         (do 
           (draw-main game (get-game-end-message game))
           game)

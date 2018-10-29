@@ -126,7 +126,6 @@
          :game-mode :human-vs-human
          :player-1-token :x
          :player-2-token :o
-         :board [:x :x :o :o :o :x :x :o :x]
          :turns [{:board [:x nil nil nil nil nil nil nil nil]
                   :current-token :player-1-token}
                  {:board [:x nil nil nil nil nil nil nil nil]

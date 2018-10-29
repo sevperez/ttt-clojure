@@ -17,10 +17,20 @@
       (all-move-options ttt-eval/eval-functions mm/minimax
         {:language :en
          :game-mode :human-vs-computer
-         :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
-         :board [:x :x nil :x :o nil :o :o nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x nil nil nil nil nil nil :o nil]
+                  :current-token :player-2-token}
+                 {:board [:x :x nil nil nil nil nil :o nil]
+                  :current-token :player-1-token}
+                 {:board [:x :x nil nil nil nil :o :o nil]
+                  :current-token :player-2-token}
+                 {:board [:x :x nil :x nil nil :o :o nil]
+                  :current-token :player-1-token}
+                 {:board [:x :x nil :x :o nil :o :o nil]
+                  :current-token :player-2-token}]}
         :player-2-token)))))
 
 (deftest top-move-options-test
@@ -40,28 +50,34 @@
       (choose-move ttt-eval/eval-functions mm/minimax
         {:language :en
          :game-mode :human-vs-computer
-         :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
-         :board [:x :x nil :o :o nil :o :x :o]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :x nil :o :o nil :o :x :o]
+                  :current-token :player-2-token}]}
         :player-2-token))))
   (testing "it returns index of a blocking move if loss imminent"
     (is (= 8
       (choose-move ttt-eval/eval-functions mm/minimax
         {:language :en
          :game-mode :human-vs-computer
-         :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
-         :board [nil nil :o nil :x :o :x nil nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [nil nil :o nil :x :o :x nil nil]
+                  :current-token :player-2-token}]}
         :player-2-token))))
   (testing "it preferentially returns a winning move over a blocking move"
     (is (= 2
       (choose-move ttt-eval/eval-functions mm/minimax
         {:language :en
          :game-mode :human-vs-computer
-         :current-token :player-2-token
          :player-1-token :o
          :player-2-token :x
-         :board [:x :x nil :o :o nil nil nil nil]}
+         :turns [{:board [nil nil nil nil nil nil nil nil nil]
+                  :current-token :player-1-token}
+                 {:board [:x :x nil :o :o nil nil nil nil]
+                  :current-token :player-2-token}]}
         :player-2-token)))))

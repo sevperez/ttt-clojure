@@ -20,8 +20,8 @@
       0)))
 
 (defn- minimize-maximize-select [selection-fn eval-fns game player depth alpha beta]
-  (let [board      (:board game)
-        next-token ((:current-token game) game)
+  (let [board      (:board (last (:turns game)))
+        next-token ((:current-token (last (:turns game))) game)
         boards     ((:possible-board-states eval-fns) board next-token)]
     (loop [idx           0
            best          (if (= selection-fn min) max-score min-score)
@@ -30,7 +30,7 @@
         best
         (let [next-board    (get boards idx)
               next-player   (switch-current-token game)
-              updated-game  (assoc game :board next-board :current-token next-player)
+              updated-game  (assoc game :turns [(assoc {} :board next-board :current-token next-player)])
               score         (minimax-memo eval-fns updated-game player (dec depth) alpha beta)]
           (recur
             (inc idx)
@@ -42,7 +42,7 @@
 (def minimize (partial minimize-maximize-select min))
 
 (defn minimize-maximize [eval-fns game player depth alpha beta]
-  (let [next-token  ((:current-token game) game)]
+  (let [next-token  ((:current-token (last (:turns game))) game)]
     (if (player-move? (player game) next-token)
       (maximize eval-fns game player depth alpha beta)
       (minimize eval-fns game player depth alpha beta))))
@@ -53,7 +53,7 @@
   ([eval-fns game player depth]
     (minimax eval-fns game player depth min-score max-score))
   ([eval-fns game player depth alpha beta]
-    (let [board         (:board game)
+    (let [board         (:board (last (:turns game)))
           test-token    (player game)
           other-player  (get-other-player player)
           other-token   (other-player game)]

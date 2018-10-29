@@ -2,7 +2,7 @@
   (:require [clojure.string :as s]
             [ttt-core.rules :refer [is-move-valid?]]
             [ttt-core.translate :refer [translate]]
-            [persistence.db :refer [retrieve-last history-to-game]]))
+            [persistence.db :refer [retrieve-last adjust-history-map-keywords]]))
 
 (def board-shape 
   (str "          |     |     \n"
@@ -68,7 +68,7 @@
     (clear-terminal)
     (draw-header (:language game))
     (draw-player-info game)
-    (draw-board (:board game))
+    (draw-board (:board (last (:turns game))))
     (println message)
     (draw-footer)))
 
@@ -106,7 +106,7 @@
 
 (defn handle-load-game-selection []
   (let [last-game (retrieve-last)]
-    (if last-game (history-to-game last-game) nil)))
+    (if last-game (adjust-history-map-keywords last-game) nil)))
 
 (defn handle-game-setup [game]
   (loop [game      game
@@ -139,7 +139,7 @@
 
 (defn get-player-move-selection [game] 
   (let [input (get-index-adjusted-input)]
-    (if (is-move-valid? (:board game) input) 
+    (if (is-move-valid? (:board (last (:turns game))) input) 
       input
       (throw (ex-info (translate [(:language game)] [:invalid-move]) {})))))
 
@@ -154,7 +154,7 @@
 
 (defn build-choose-move-string [game]
   (str (translate [(:language game)] [:choose-move-string]) 
-    " (" (s/join ", " (get-available-indices (:board game))) ")"))
+    " (" (s/join ", " (get-available-indices (:board (last (:turns game))))) ")"))
 
 (defn handle-player-move-selection
   ([game]
@@ -163,7 +163,8 @@
     (do
       (draw-main game
         (build-current-player-string
-          (current-player-name (:current-token game) (:game-mode game) (:language game))
+          (current-player-name
+            (:current-token (last (:turns game))) (:game-mode game) (:language game))
           (:language game)))
       (println message))
     (try 

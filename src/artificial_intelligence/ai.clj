@@ -4,20 +4,35 @@
   (if (= :player-1-token player) :player-2-token :player-1-token))
 
 (defn switch-current-token [game]
-  (if (= (:current-token game) :player-1-token) :player-2-token :player-1-token))
+  (if (= (:current-token (last (:turns game))) :player-1-token) :player-2-token :player-1-token))
 
-(defn- simulate-move [board location token] (assoc board location token))
+;; TEMP TEMP TEMP TEMP TEMP TEMP
+
+(defn fill-location [board token location]
+  (assoc board location token))
+
+(defn- update-current-player [game]
+  (if (= (:current-token (last (:turns game))) :player-1-token) :player-2-token :player-1-token))
+
+(defn- get-current-token [game] ((:current-token (last (:turns game))) game))
+
+(defn- update-board [board token location] (fill-location board token location))
+
+(defn- simulate-move [game location]
+  (let [last-turn (last (:turns game))
+        new-board (update-board (:board last-turn) (get-current-token game) location)
+        new-token (update-current-player game)
+        new-turns (conj (:turns game) {:board new-board :current-token new-token})]
+    (assoc game :turns new-turns)))
+
+;; TEMP TEMP TEMP TEMP TEMP TEMP
 
 (defn- generate-move-option [eval-fns algorithm-fn game player location]
-  (let [board       (:board game)
-        next-token  ((:current-token game) game)
-        next-board  (simulate-move board location next-token)
-        next-player (get-other-player player)
-        next-game   (assoc game :board next-board :current-token next-player)]
+  (let [next-game   (simulate-move game location)]
     (assoc {} :location location :score (algorithm-fn eval-fns next-game player))))
 
 (defn all-move-options [eval-fns algorithm-fn game player]
-  (let [available-locations ((:empty-locations eval-fns) (:board game))]
+  (let [available-locations ((:empty-locations eval-fns) (:board (last (:turns game))))]
     (loop [idx          0
            move-options []]
       (if (>= idx (count available-locations))

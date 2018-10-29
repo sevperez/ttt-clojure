@@ -150,27 +150,3 @@
            :player-1-token "x"
            :player-2-token "o"
            :updated-at "2018-10-25T18:18:02.007Z"})))))
-
-(deftest history-to-game-test
-  (testing "it returns nil if the provided history-map is nil"
-    (is (= nil (history-to-game nil))))
-  (testing "it returns a game map from the provided history-map"
-    (is (= {:_id "456def"
-            :created-at "2018-10-25T18:17:36.466Z"
-            :game-mode :human-vs-human
-            :board [ :x :o nil nil nil nil nil nil ]
-            :current-token :player-1-token
-            :language :pl
-            :player-1-token :x
-            :player-2-token :o
-            :updated-at "2018-10-25T18:18:02.007Z"} 
-      (history-to-game
-        {:_id "456def"
-         :created-at "2018-10-25T18:17:36.466Z"
-         :game-mode "human-vs-human"
-         :turns [{:board [ "x" "o" nil nil nil nil nil nil]
-                  :current-token "player-1-token"}]
-         :language "pl"
-         :player-1-token "x"
-         :player-2-token "o"
-         :updated-at "2018-10-25T18:18:02.007Z"})))))
