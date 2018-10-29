@@ -6,26 +6,14 @@
 (defn switch-current-token [game]
   (if (= (:current-token (last (:turns game))) :player-1-token) :player-2-token :player-1-token))
 
-;; TEMP TEMP TEMP TEMP TEMP TEMP
-
-(defn fill-location [board token location]
-  (assoc board location token))
-
-(defn- update-current-player [game]
-  (if (= (:current-token (last (:turns game))) :player-1-token) :player-2-token :player-1-token))
-
 (defn- get-current-token [game] ((:current-token (last (:turns game))) game))
-
-(defn- update-board [board token location] (fill-location board token location))
 
 (defn- simulate-move [game location]
   (let [last-turn (last (:turns game))
-        new-board (update-board (:board last-turn) (get-current-token game) location)
-        new-token (update-current-player game)
+        new-board (assoc (:board last-turn) location (get-current-token game))
+        new-token (switch-current-token game)
         new-turns (conj (:turns game) {:board new-board :current-token new-token})]
     (assoc game :turns new-turns)))
-
-;; TEMP TEMP TEMP TEMP TEMP TEMP
 
 (defn- generate-move-option [eval-fns algorithm-fn game player location]
   (let [next-game   (simulate-move game location)]
